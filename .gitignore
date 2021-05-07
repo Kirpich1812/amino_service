@@ -1,7 +1,7 @@
 .idea/
 **/__pycache__
 tests.py
-auth/*
+auth/**
 bots.yaml
 bots.txt
 comments.txt
