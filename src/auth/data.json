@@ -1,1 +1,6 @@
-[]
+[
+  {
+    "email": "test_email",
+    "password": "password"
+  }
+]

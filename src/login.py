@@ -89,7 +89,7 @@ def check_sid():
             continue
     if bads:
         print(f"{len(bads)} invalid accounts, start fixing...")
-        pool = ThreadPool(100)
+        pool = ThreadPool(50)
         valid_list = pool.map(update_sid, bads)
         with open(os.path.join(os.getcwd(), "src", "accounts", "bots.yaml"), "w") as accounts_file:
             yaml.dump(valid_list, accounts_file, Dumper=yaml.Dumper)

@@ -91,7 +91,7 @@ class ServiceApp:
                             break
                 elif management_choice == "2":
                     check_sid()
-                    pool = ThreadPool(int(input("Number of threads: ")))
+                    pool = ThreadPool(int(input("Number of threads(press ENTER to set as default): ")))
                     while True:
                         print(colored(open("src/view/bot_management.txt", "r").read(), "cyan"))
                         choice = input("Enter the number >>> ")
