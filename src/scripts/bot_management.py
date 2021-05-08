@@ -115,6 +115,9 @@ class BotManagement:
                 print(align(email, "Join"))
             except Exception as e:
                 print(align(email, str(e)))
+        if invitation_id is None:
+            client.join_community(comId=self.com_id)
+            print(align(email, "Join"))
 
     def send_message(self, object_id, text, account: dict):
         email = account.get("email")
