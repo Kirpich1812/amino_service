@@ -1,9 +1,6 @@
 - email: email1
-  isValid: false
   password: password1
 - email: email2
-  isValid: false
   password: password2
 - email: email3
-  isValid: false
   password: password3
