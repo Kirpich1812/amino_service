@@ -54,13 +54,12 @@ class Badass:
         count = 0
         for i in range(0, 10000, 100):
             users = self.sub_client.get_online_users(start=i, size=100).profile.userId
-            if users:
-                for userid in users:
-                    pool.apply_async(self.sub_client.invite_to_chat, [userid, chatid])
-                    count += 1
-                    print(f"{count} users invited to chat", end="\r")
-            else:
+            if not users:
                 break
+            for userid in users:
+                pool.apply_async(self.sub_client.invite_to_chat, [userid, chatid])
+                count += 1
+                print(f"{count} users invited to chat", end="\r")
         print("All online users invited to chat")
 
     def spam_posts(self):

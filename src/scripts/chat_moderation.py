@@ -18,23 +18,21 @@ class ChatModeration:
         back = False
         chat = self.sub_client.get_chat_thread(chatId=chatid)
         admins = [*chat.coHosts, chat.author.userId]
-        if self.sub_client.profile.userId in admins:
-            while not back:
-                messages = self.sub_client.get_chat_messages(chatId=chatid, size=100, pageToken=next_page)
-                if messages.messageId:
-                    next_page = messages.nextPageToken
-                    for message_id in messages.messageId:
-                        if deleted < count:
-                            pool.apply_async(self.sub_client.delete_message, [chatid, message_id, False, None])
-                            deleted += 1
-                            print(f"{deleted} messages deleted", end="\r")
-                        else:
-                            back = True
-                            break
-                else:
-                    break
-        else:
+        if self.sub_client.profile.userId not in admins:
             print(colored("You don't have co-host/host rights to use this function", "red"))
+            return
+        while not back:
+            messages = self.sub_client.get_chat_messages(chatId=chatid, size=100, pageToken=next_page)
+            if not messages.messageId:
+                break
+            next_page = messages.nextPageToken
+            for message_id in messages.messageId:
+                if deleted >= count:
+                    back = True
+                    break
+                pool.apply_async(self.sub_client.delete_message, [chatid, message_id, False, None])
+                deleted += 1
+                print(f"{deleted} messages deleted", end="\r")
 
     def save_chat_settings(self, chatid: str):
         if not os.path.exists(os.path.join(os.getcwd(), "src", "chat_settings")):

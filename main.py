@@ -1,10 +1,14 @@
 import os
 import json
+import traceback
+
 import requests
 
 from sys import platform
 from colorama import init
 from termcolor import colored
+
+from src.logger import logger
 from src.service import ServiceApp
 
 
@@ -28,4 +32,8 @@ if __name__ == '__main__':
 
     print(colored(open("src/view/logo.txt", "r").read().replace("v?", __version__).replace("a?", __author__).replace("g?", __github__).replace("_", " "), "green"))
 
-    ServiceApp().run()
+    try:
+        logger.debug("Start service")
+        ServiceApp().run()
+    except Exception as e:
+        logger.debug(traceback.format_exc())

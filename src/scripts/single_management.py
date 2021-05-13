@@ -31,8 +31,7 @@ class SingleManagement:
                     answers_list.append(answer_id)
         for i in range(2):
             try:
-                self.sub_client.play_quiz(quizId=object_id, questionIdsList=questions_list, answerIdsList=answers_list,
-                                          quizMode=i)
+                self.sub_client.play_quiz(quizId=object_id, questionIdsList=questions_list, answerIdsList=answers_list, quizMode=i)
             except:
                 pass
         print(f"[quiz]: Passed the quiz!")
@@ -46,13 +45,12 @@ class SingleManagement:
         while True:
             followings = self.sub_client.get_user_following(userId=self.sub_client.profile.userId, start=x, size=100)
             x += 100
-            if followings.userId:
-                for i in followings.userId:
-                    thread_pool.apply_async(self.sub_client.unfollow, [i])
-                    count += 1
-                    print(f"Unfollowing: {count}")
-            else:
+            if not followings.userId:
                 break
+            for i in followings.userId:
+                thread_pool.apply_async(self.sub_client.unfollow, [i])
+                count += 1
+                print(f"Unfollowing: {count}")
 
     def like_recent_blogs(self):
         comments = open(os.path.join(os.getcwd(), "src", "activity", "comments.txt"), "r", encoding="utf-8").readlines()
@@ -62,20 +60,20 @@ class SingleManagement:
         for x in range(0, 100000, 100):
             blogs = self.sub_client.get_recent_blogs(pageToken=token, start=x, size=100)
             token = blogs.nextPageToken
-            if token not in old:
-                old.append(token)
-                for blog_id in blogs.blogId:
-                    if blog_id not in old:
-                        old.append(blog_id)
-                        try:
-                            self.sub_client.like_blog(blogId=blog_id)
-                            count += 1
-                            print(f"{count} posts liked", end="\r")
-                            self.sub_client.comment(blogId=blog_id, message=random.choice(comments))
-                        except:
-                            pass
-            else:
+            if token in old:
                 break
+            old.append(token)
+            for blog_id in blogs.blogId:
+                if blog_id in old:
+                    continue
+                old.append(blog_id)
+                try:
+                    self.sub_client.like_blog(blogId=blog_id)
+                    count += 1
+                    print(f"{count} posts liked", end="\r")
+                    self.sub_client.comment(blogId=blog_id, message=random.choice(comments))
+                except:
+                    pass
 
     def follow_all(self):
         old = []
@@ -84,62 +82,58 @@ class SingleManagement:
         for i in range(0, 20000, 100):
             recent_users = self.sub_client.get_all_users(type="recent", start=i, size=100).profile.userId
             users = [*recent_users]
-            if users:
-                for _ in range(2):
-                    pool.apply_async(self.sub_client.follow, [users])
-                count += len(users)
-                print(f"Follow to {count} users", end="\r")
-            else:
+            if not users:
                 break
+            for _ in range(2):
+                pool.apply_async(self.sub_client.follow, [users])
+            count += len(users)
+            print(f"Follow to {count} users", end="\r")
         for i in range(0, 20000, 100):
             online_users = self.sub_client.get_online_users(start=i, size=100).profile.userId
             users = [*online_users]
-            if users:
-                for _ in range(2):
-                    pool.apply_async(self.sub_client.follow, [users])
-                count += len(users)
-                print(f"Follow to {count} users", end="\r")
-            else:
+            if not users:
                 break
+            for _ in range(2):
+                pool.apply_async(self.sub_client.follow, [users])
+            count += len(users)
+            print(f"Follow to {count} users", end="\r")
         for i in range(0, 20000, 100):
             banned_users = self.sub_client.get_all_users(type="banned", start=i, size=100).profile.userId
             users = [*banned_users]
-            if users:
-                for _ in range(2):
-                    pool.apply_async(self.sub_client.follow, [users])
-                count += len(users)
-                print(f"Follow to {count} users", end="\r")
-            else:
+            if not users:
                 break
+            for _ in range(2):
+                pool.apply_async(self.sub_client.follow, [users])
+            count += len(users)
+            print(f"Follow to {count} users", end="\r")
         for i in range(0, 20000, 100):
             chats = self.sub_client.get_public_chat_threads(type="recommended", start=i, size=100).chatId
-            if chats:
-                for chatid in chats:
-                    for x in range(0, 1000, 100):
-                        users = self.sub_client.get_chat_users(chatId=chatid, start=x, size=100).userId
-                        if users:
-                            for userid in old:
-                                if userid in users:
-                                    users.remove(userid)
-                            for _ in range(2):
-                                pool.apply_async(self.sub_client.follow, [users])
-                            count += len(users)
-                            print(f"Follow to {count} users", end="\r")
-                        else:
-                            break
-            else:
+            if not chats:
                 break
+            for chatid in chats:
+                for x in range(0, 1000, 100):
+                    users = self.sub_client.get_chat_users(chatId=chatid, start=x, size=100).userId
+                    if not users:
+                        break
+                    for userid in old:
+                        if userid in users:
+                            users.remove(userid)
+                    for _ in range(2):
+                        pool.apply_async(self.sub_client.follow, [users])
+                    count += len(users)
+                    print(f"Follow to {count} users", end="\r")
 
     def get_blocker_users(self):
         users = self.sub_client.get_blocker_users(start=0, size=100)
-        if users:
-            for x, i in enumerate(users, 1):
-                user = self.sub_client.get_user_info(i)
-                print(f"{x}.")
-                print(f"Userid: {i}")
-                print(f"Nickname: {user.nickname}")
-                print(f"Lvl: {user.level}")
-                print()
+        if not users:
+            return
+        for x, i in enumerate(users, 1):
+            user = self.sub_client.get_user_info(i)
+            print(f"{x}.")
+            print(f"Userid: {i}")
+            print(f"Nickname: {user.nickname}")
+            print(f"Lvl: {user.level}")
+            print()
 
     def send_coins(self, count: int, blog_id: str):
         pool = ThreadPool(3)

@@ -1,12 +1,15 @@
 import os
 import random
 import time
+import traceback
 from multiprocessing.pool import ThreadPool
 
 import yaml
+from termcolor import colored
 
 import amino
-from src.other import align, get_accounts
+from src.logger import service_log, logger
+from src.other import get_accounts
 
 
 def login(account: dict):
@@ -20,25 +23,26 @@ def login(account: dict):
         except amino.exceptions.ActionNotAllowed:
             client.device_id = client.headers.device_id = random.choice(open(os.path.join(os.getcwd(), "src", "devices", "devices.txt"), "r").readlines()).replace("\n", "")
         except amino.exceptions.FailedLogin:
-            print(align(email, "Failed login"))
+            service_log(email, "Failed login")
             return False
         except amino.exceptions.InvalidAccountOrPassword:
-            print(align(email, "Invalid account or password"))
+            service_log(email, "Invalid account or password")
             return False
         except amino.exceptions.InvalidPassword:
-            print(align(email, "Invalid Password"))
+            service_log(email, "Invalid Password")
             return False
         except amino.exceptions.InvalidEmail:
-            print(align(email, "Invalid Email"))
+            service_log(email, "Invalid Email")
             return False
         except amino.exceptions.AccountDoesntExist:
-            print(align(email, "Account does not exist"))
+            service_log(email, "Account does not exist")
             return False
         except amino.exceptions.VerificationRequired as verify:
-            print(align(email, str(verify)))
+            service_log(email, str(verify))
             return False
         except Exception as e:
-            print(align(email, str(e)))
+            service_log(email, str(e))
+            logger.debug(traceback.format_exc())
             return False
 
 
@@ -55,40 +59,47 @@ def login_sid(account: dict):
             except amino.exceptions.ActionNotAllowed:
                 client.device_id = client.headers.device_id = random.choice(open(os.path.join(os.getcwd(), "src", "devices", "devices.txt"), "r").readlines()).replace("\n", "")
             except amino.exceptions.FailedLogin:
-                print(align(email, "Failed login"))
+                service_log(email, "Failed login")
                 return False
             except amino.exceptions.InvalidAccountOrPassword:
-                print(align(email, "Invalid account or password"))
+                service_log(email, "Invalid account or password")
                 return False
             except amino.exceptions.InvalidPassword:
-                print(align(email, "Invalid Password"))
+                service_log(email, "Invalid Password")
                 return False
             except amino.exceptions.InvalidEmail:
-                print(align(email, "Invalid Email"))
+                service_log(email, "Invalid Email")
                 return False
             except amino.exceptions.AccountDoesntExist:
-                print(align(email, "Account does not exist"))
+                service_log(email, "Account does not exist")
                 return False
             except amino.exceptions.VerificationRequired as verify:
-                print(align(email, str(verify)))
+                service_log(email, str(verify))
                 return False
             except Exception as e:
-                print(align(email, str(e)))
+                service_log(email, str(e))
+                logger(traceback.format_exc())
                 return False
 
 
-def check_sid():
+def check_accounts():
     accounts = get_accounts()
+    invalids = []
     bads = []
     for i in accounts:
+        if i.get("isValid") is False:
+            invalids.append(i)
+            continue
         if i.get("sid") is None or i.get("validTime") is None or i.get("isValid") is None:
             bads.append(i)
             continue
         if i.get("validTime") <= int(time.time()):
             bads.append(i)
             continue
+    if invalids:
+        print(colored(f"{len(invalids)} invalid accounts", "red"))
     if bads:
-        print(f"{len(bads)} invalid accounts, start fixing...")
+        print(f"{len(bads)} accounts require a SID update, start updating...")
         pool = ThreadPool(50)
         valid_list = pool.map(update_sid, bads)
         with open(os.path.join(os.getcwd(), "src", "accounts", "bots.yaml"), "w") as accounts_file:

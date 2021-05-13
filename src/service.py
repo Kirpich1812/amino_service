@@ -1,13 +1,15 @@
 import json
 import os
 import pathlib
+import traceback
 from functools import partial
 from multiprocessing.pool import ThreadPool
 
 from termcolor import colored
 
 import amino
-from .login import login, check_sid
+from .logger import logger
+from .login import login, check_accounts
 from .other import get_accounts, get_count, set_auth_data, converter
 from .scripts.badass import Badass
 from .scripts.bot_management import BotManagement
@@ -43,12 +45,14 @@ class ServiceApp:
         if not self.client:
             print(colored("Failed login", "red"))
             exit(0)
+        logger.debug(f"Login ({email}:{password})")
         print(colored("Login was successful!", "green"))
 
         subs = self.client.sub_clients(start=0, size=100)
         for x, com_name in enumerate(subs.name, 1):
             print(f"{x}. {com_name}")
         self.sub_client = amino.SubClient(comId=subs.comId[int(input("Enter community number: ")) - 1], client=self.client)
+        logger.debug(f"Community {self.sub_client.comId}")
 
         self.single_management = SingleManagement(self.sub_client)
         self.bot_management = BotManagement(self.sub_client)
@@ -61,9 +65,11 @@ class ServiceApp:
                 print(colored(open("src/view/management_choice.txt", "r").read(), "cyan"))
                 management_choice = input("Enter the number >>> ")
                 if management_choice == "1":
+                    logger.debug("Management choice 1")
                     while True:
                         print(colored(open("src/view/single_management.txt", "r").read(), "cyan"))
                         choice = input("Enter the number >>> ")
+                        logger.debug(f"Function choice {choice}")
                         if choice == "1":
                             quiz_link = input("Quiz link: ")
                             object_id = self.client.get_from_code(str(quiz_link.split('/')[-1])).objectId
@@ -90,11 +96,13 @@ class ServiceApp:
                         elif choice == "b":
                             break
                 elif management_choice == "2":
-                    check_sid()
-                    pool = ThreadPool(int(input("Number of threads(press ENTER to set as default): ")))
+                    logger.debug("Management choice 2")
+                    check_accounts()
+                    pool = ThreadPool(int(input("Number of threads: ")))
                     while True:
                         print(colored(open("src/view/bot_management.txt", "r").read(), "cyan"))
                         choice = input("Enter the number >>> ")
+                        logger.debug(f"Function choice {choice}")
                         if choice == "1":
                             result = pool.map(self.bot_management.play_lottery, get_accounts())
                             count_result = get_count(result)
@@ -195,9 +203,11 @@ class ServiceApp:
                         elif choice == "b":
                             break
                 elif management_choice == "3":
+                    logger.debug("Management choice 3")
                     while True:
                         print(colored(open("src/view/chat_moderation.txt", "r").read(), "cyan"))
                         choice = input("Enter the number >>> ")
+                        logger.debug(f"Function choice {choice}")
                         if choice == "1":
                             object_link = input("Link: ")
                             object_id = self.client.get_from_code(str(object_link.split('/')[-1])).objectId
@@ -223,9 +233,11 @@ class ServiceApp:
                         elif choice == "b":
                             break
                 elif management_choice == "4":
+                    logger.debug("Management choice 4")
                     while True:
                         print(colored(open("src/view/badass.txt", "r").read(), "cyan"))
                         choice = input("Enter the number >>> ")
+                        logger.debug(f"Function choice {choice}")
                         if choice == "1":
                             object_link = input("Link: ")
                             object_id = self.client.get_from_code(str(object_link.split('/')[-1])).objectId
@@ -252,8 +264,11 @@ class ServiceApp:
                         elif choice == "b":
                             break
                 elif management_choice == "5":
+                    logger.debug("Management choice 5")
                     CreateAccounts().run()
                 elif management_choice == "0":
+                    logger.debug("Management choice 0")
                     converter()
             except Exception as e:
                 print(colored(str(e), "red"))
+                logger(traceback.format_exc())
