@@ -11,8 +11,8 @@ class BotManagement:
     def __init__(self, sub_client: amino.SubClient):
         self.com_id = sub_client.comId
 
-    def play_lottery(self, account: dict):
-        email = account.get("email")
+    def play_lottery(self, account: tuple):
+        email = account[0]
         client = login_sid(account)
         if not client:
             return
@@ -29,8 +29,8 @@ class BotManagement:
         except Exception as e:
             service_log(email, str(e))
 
-    def send_coins(self, object_id, account: dict):
-        email = account.get("email")
+    def send_coins(self, object_id, account: tuple):
+        email = account[0]
         client = login_sid(account)
         if not client:
             return
@@ -52,8 +52,8 @@ class BotManagement:
         except Exception as e:
             service_log(email, str(e))
 
-    def like_blog(self, object_id, account: dict):
-        email = account.get("email")
+    def like_blog(self, object_id, account: tuple):
+        email = account[0]
         client = login_sid(account)
         if not client:
             return
@@ -69,8 +69,8 @@ class BotManagement:
         except Exception as e:
             service_log(email, str(e))
 
-    def join_bots_to_chat(self, object_id, account: dict):
-        email = account.get("email")
+    def join_bots_to_chat(self, object_id, account: tuple):
+        email = account[0]
         client = login_sid(account)
         if not client:
             return
@@ -85,8 +85,8 @@ class BotManagement:
         except Exception as e:
             service_log(email, str(e))
 
-    def leave_bots_from_chat(self, object_id, account: dict):
-        email = account.get("email")
+    def leave_bots_from_chat(self, object_id, account: tuple):
+        email = account[0]
         client = login_sid(account)
         if not client:
             return
@@ -101,8 +101,8 @@ class BotManagement:
         except Exception as e:
             service_log(email, str(e))
 
-    def join_bots_to_community(self, inv_link=None, account: dict = None):
-        email = account.get("email")
+    def join_bots_to_community(self, inv_link=None, account: tuple = None):
+        email = account[0]
         client = login_sid(account)
         if not client:
             return
@@ -119,8 +119,8 @@ class BotManagement:
             client.join_community(comId=self.com_id)
             service_log(email, "Join")
 
-    def send_message(self, object_id, text, account: dict):
-        email = account.get("email")
+    def send_message(self, object_id, text, account: tuple):
+        email = account[0]
         client = login_sid(account)
         if not client:
             return
@@ -139,8 +139,8 @@ class BotManagement:
         except Exception as e:
             service_log(email, str(e))
 
-    def follow(self, object_id, account: dict):
-        email = account.get("email")
+    def follow(self, object_id, account: tuple):
+        email = account[0]
         client = login_sid(account)
         if not client:
             return
@@ -155,8 +155,8 @@ class BotManagement:
         except Exception as e:
             service_log(email, str(e))
 
-    def unfollow(self, object_id, account: dict):
-        email = account.get("email")
+    def unfollow(self, object_id, account: tuple):
+        email = account[0]
         client = login_sid(account)
         if not client:
             return
@@ -171,8 +171,8 @@ class BotManagement:
         except Exception as e:
             service_log(email, str(e))
 
-    def start_chat(self, object_id, account: dict):
-        email = account.get("email")
+    def start_chat(self, object_id, account: tuple):
+        email = account[0]
         client = login_sid(account)
         if not client:
             return
@@ -187,8 +187,8 @@ class BotManagement:
         except Exception as e:
             service_log(email, str(e))
 
-    def set_online_status(self, account: dict):
-        email = account.get("email")
+    def set_online_status(self, account: tuple):
+        email = account[0]
         client = login_sid(account)
         if not client:
             return
@@ -201,8 +201,8 @@ class BotManagement:
         except Exception as e:
             service_log(email, str(e))
 
-    def change_nick_random(self, max_length, nick, account: dict):
-        email = account.get("email")
+    def change_nick_random(self, max_length, nick, account: tuple):
+        email = account[0]
         client = login_sid(account)
         if not client:
             return
@@ -217,8 +217,8 @@ class BotManagement:
         except Exception as e:
             service_log(email, str(e))
 
-    def change_icon_random(self, images: list, account: dict):
-        email = account.get("email")
+    def change_icon_random(self, images: list, account: tuple):
+        email = account[0]
         client = login_sid(account)
         if not client:
             return
@@ -232,8 +232,8 @@ class BotManagement:
         except Exception as e:
             service_log(email, str(e))
 
-    def wall_comment(self, userid: str, text: str, account: dict):
-        email = account.get("email")
+    def wall_comment(self, userid: str, text: str, account: tuple):
+        email = account[0]
         client = login_sid(account)
         if not client:
             return
@@ -246,8 +246,8 @@ class BotManagement:
         except Exception as e:
             service_log(email, str(e))
 
-    def vote_poll(self, blog_id: str, option_id: str, account: dict):
-        email = account.get("email")
+    def vote_poll(self, blog_id: str, option_id: str, account: tuple):
+        email = account[0]
         client = login_sid(account)
         if not client:
             return

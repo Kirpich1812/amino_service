@@ -1,10 +1,10 @@
 import os
 import random
 
-import yaml
 from termcolor import colored
 
 import amino
+from src.database import DatabaseController
 from src.nick_gen import UsernameGenerator
 
 
@@ -20,7 +20,10 @@ class CreateAccounts:
         self.count = 0
 
     def run(self):
-        reg_devices = open(os.path.join(os.getcwd(), "src", "devices", "reg_devices.txt"), "r").readlines()
+        if not os.path.exists(os.path.join(os.getcwd(), "src", "reg_devices.txt")):
+            print(colored("src > reg_devices.txt not found", "red"))
+            return
+        reg_devices = open(os.path.join(os.getcwd(), "src", "reg_devices.txt"), "r").readlines()
         if reg_devices:
             for device in reg_devices:
                 self.client.device_id = self.client.headers.device_id = device.replace("\n", "")
@@ -91,7 +94,7 @@ class CreateAccounts:
                 self.client.login(email=self.email, password=self.password)
                 return True
             except amino.exceptions.ActionNotAllowed:
-                self.client.device_id = random.choice(open(os.path.join(os.getcwd(), "src", "devices", "devices.txt"), "r").readlines()).replace("\n", "")
+                self.client.device_id = self.client.headers.device_id = random.choice(DatabaseController().get_device_ids())[0]
             except Exception as e:
                 print(colored(str(e), "red"))
                 return False
@@ -106,13 +109,13 @@ class CreateAccounts:
                 return False
 
     def save_account(self):
-        with open(os.path.join(os.getcwd(), "src", "accounts", "created_accounts.yaml"), "a") as accounts_file:
-            yaml.dump([{"email": self.email, "password": self.password}], accounts_file, Dumper=yaml.Dumper)
-        print(colored(f"{self.email} saved in created_accounts.yaml", "green"))
+        with open(os.path.join(os.getcwd(), "src", "created_accounts.txt"), "a") as accounts_file:
+            accounts_file.write(f"{self.email}:{self.password}\n")
+        print(colored(f"{self.email} saved in created_accounts.txt", "green"))
 
     def remove_device(self):
-        devices = open(os.path.join(os.getcwd(), "src", "devices", "reg_devices.txt"), "r").readlines()
+        devices = open(os.path.join(os.getcwd(), "src", "reg_devices.txt"), "r").readlines()
         devices.pop(0)
-        with open(os.path.join(os.getcwd(), "src", "devices", "reg_devices.txt"), "w") as devices_file:
+        with open(os.path.join(os.getcwd(), "src", "reg_devices.txt"), "w") as devices_file:
             for i in devices:
                 devices_file.write(i)

@@ -1,5 +1,6 @@
-from src.other import get_accounts
 import logging
+
+from src.database import DatabaseController
 
 logger = logging.getLogger('amino_service')
 logger.setLevel(logging.DEBUG)
@@ -12,7 +13,8 @@ fh.setFormatter(formatter)
 # add the handlers to logger
 logger.addHandler(fh)
 
-spaces = max([len(i) for i in get_accounts()])
+if DatabaseController().get_bots():
+    spaces = max([len(i[0]) for i in DatabaseController().get_bots()])
 
 
 def service_log(email: str, action: str):

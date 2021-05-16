@@ -1,7 +1,6 @@
 .idea/
+venv
 **/__pycache__
 tests.py
 *.log
-src/auth/**
-src/accounts/**
-src/activity/**
+*.db

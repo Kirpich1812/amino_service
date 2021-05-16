@@ -1,5 +1,3 @@
-import json
-import os
 import pathlib
 import traceback
 from functools import partial
@@ -8,9 +6,10 @@ from multiprocessing.pool import ThreadPool
 from termcolor import colored
 
 import amino
+from .converter import convert_from_txt
+from .database import DatabaseController
 from .logger import logger
 from .login import login, check_accounts
-from .other import get_accounts, get_count, set_auth_data, converter
 from .scripts.badass import Badass
 from .scripts.bot_management import BotManagement
 from .scripts.chat_moderation import ChatModeration
@@ -20,28 +19,34 @@ from .scripts.single_management import SingleManagement
 
 class ServiceApp:
     def __init__(self):
-        accounts = json.load(open(os.path.join(os.getcwd(), "src", "auth", "data.json"), "r"))
-        email = None
-        password = None
-        if accounts:
-            print("Accounts:")
-            for x, account in enumerate(accounts, 1):
-                print(f"{x}. {account.get('email')}")
-            choice = input("\nEnter \"+\" to add account\n>>> ")
-            if choice == "+":
+        while True:
+            accounts = DatabaseController().get_auth_data()
+            if accounts:
+                print("Accounts:")
+                for x, account in enumerate(accounts, 1):
+                    print(f"{x}. {account[0]}")
+                choice = input("\nEnter \"+\" to add an account or \"-\" to delete\n>>> ")
+                if choice == "+":
+                    email = input("Email: ")
+                    password = input("Password: ")
+                    DatabaseController().set_auth_data(email, password)
+                if choice == "-":
+                    delete_choice = input("Enter account number: ")
+                    index = int(delete_choice) - 1
+                    email = accounts[index][0]
+                    DatabaseController().remove_account(email)
+                else:
+                    index = int(choice) - 1
+                    email = accounts[index][0]
+                    password = accounts[index][1]
+                    break
+            if not accounts:
                 email = input("Email: ")
                 password = input("Password: ")
-                set_auth_data({"email": email, "password": password})
-            else:
-                index = int(choice) - 1
-                email = accounts[index].get("email")
-                password = accounts[index].get("password")
-        if not accounts:
-            email = input("Email: ")
-            password = input("Password: ")
-            set_auth_data({"email": email, "password": password})
+                DatabaseController().set_auth_data(email, password)
+                break
 
-        self.client = login({"email": email, "password": password})
+        self.client = login((email, password))
         if not self.client:
             print(colored("Failed login", "red"))
             exit(0)
@@ -104,31 +109,41 @@ class ServiceApp:
                         choice = input("Enter the number >>> ")
                         logger.debug(f"Function choice {choice}")
                         if choice == "1":
-                            result = pool.map(self.bot_management.play_lottery, get_accounts())
-                            count_result = get_count(result)
-                            print(f"Accounts: {count_result['accounts']}\nResult: +{count_result['count']} coins")
+                            result = pool.map(self.bot_management.play_lottery, DatabaseController().get_bots())
+                            total_count = 0
+                            total_accounts = 0
+                            for i in result:
+                                if type(i) == int:
+                                    total_accounts += 1
+                                    total_count += i
+                            print(f"Accounts: {total_accounts}\nResult: +{total_count} coins")
                             print("[PlayLottery]: Finish.")
                         elif choice == "2":
                             blog_link = input("Blog link: ")
                             object_id = self.client.get_from_code(str(blog_link.split('/')[-1])).objectId
-                            result = pool.map(partial(self.bot_management.send_coins, object_id), get_accounts())
-                            count_result = get_count(result)
-                            print(f"Accounts {count_result['accounts']}\nResult: +{count_result['count']} coins")
+                            result = pool.map(partial(self.bot_management.send_coins, object_id), DatabaseController().get_bots())
+                            total_count = 0
+                            total_accounts = 0
+                            for i in result:
+                                if type(i) == int:
+                                    total_accounts += 1
+                                    total_count += i
+                            print(f"Accounts {total_accounts}\nResult: +{total_count} coins")
                             print("[SendCoins]: Finish.")
                         elif choice == "3":
                             blog_link = input("Blog link: ")
                             object_id = self.client.get_from_code(str(blog_link.split('/')[-1])).objectId
-                            pool.map(partial(self.bot_management.like_blog, object_id), get_accounts())
+                            pool.map(partial(self.bot_management.like_blog, object_id), DatabaseController().get_bots())
                             print("[LikeBlog]: Finish.")
                         elif choice == "4":
                             object_link = input("Link: ")
                             object_id = self.client.get_from_code(str(object_link.split('/')[-1])).objectId
-                            pool.map(partial(self.bot_management.join_bots_to_chat, object_id), get_accounts())
+                            pool.map(partial(self.bot_management.join_bots_to_chat, object_id), DatabaseController().get_bots())
                             print("[JoinBotsToChat]: Finish.")
                         elif choice == "5":
                             object_link = input("Link: ")
                             object_id = self.client.get_from_code(str(object_link.split('/')[-1])).objectId
-                            pool.map(partial(self.bot_management.leave_bots_from_chat, object_id), get_accounts())
+                            pool.map(partial(self.bot_management.leave_bots_from_chat, object_id), DatabaseController().get_bots())
                             print("[LeaveBotsFromChat]: Finish.")
                         elif choice == "6":
                             subs = self.client.sub_clients(start=0, size=100)
@@ -138,26 +153,26 @@ class ServiceApp:
                             invite_link = None
                             if self.client.get_community_info(object_id).joinType == 2:
                                 invite_link = input("Enter invite link/code: ")
-                            pool.map(partial(self.bot_management.join_bots_to_community, invite_link), get_accounts())
+                            pool.map(partial(self.bot_management.join_bots_to_community, invite_link), DatabaseController().get_bots())
                             print("[JoinBotsToCommunity]: Finish.")
                         elif choice == "7":
                             object_link = input("Link: ")
                             object_id = self.client.get_from_code(str(object_link.split('/')[-1])).objectId
                             text = input("Message text: ")
-                            pool.map(partial(self.bot_management.send_message, object_id, text), get_accounts())
+                            pool.map(partial(self.bot_management.send_message, object_id, text), DatabaseController().get_bots())
                             print("[SendMessage]: Finish.")
                         elif choice == "8":
                             user_link = input("Link to user: ")
                             object_id = self.client.get_from_code(str(user_link.split('/')[-1])).objectId
-                            pool.map(partial(self.bot_management.follow, object_id), get_accounts())
+                            pool.map(partial(self.bot_management.follow, object_id), DatabaseController().get_bots())
                             print("[Follow]: Finish.")
                         elif choice == "9":
                             user_link = input("Link to user: ")
                             object_id = self.client.get_from_code(str(user_link.split('/')[-1])).objectId
-                            pool.map(partial(self.bot_management.unfollow, object_id), get_accounts())
+                            pool.map(partial(self.bot_management.unfollow, object_id), DatabaseController().get_bots())
                             print("[Unfollow]: Finish.")
                         elif choice == "10":
-                            pool.map(self.bot_management.set_online_status, get_accounts())
+                            pool.map(self.bot_management.set_online_status, DatabaseController().get_bots())
                             print("[SetOnlineStatus]: Finish.")
                         elif choice == "11":
                             print("1 - Random nick")
@@ -165,16 +180,16 @@ class ServiceApp:
                             mode = input("Select mode: ")
                             if mode == "1":
                                 max_length = int(input("Max nick length: "))
-                                pool.map(partial(self.bot_management.change_nick_random, max_length, None), get_accounts())
+                                pool.map(partial(self.bot_management.change_nick_random, max_length, None), DatabaseController().get_bots())
                             else:
                                 nick = input("Enter nick: ")
-                                pool.map(partial(self.bot_management.change_nick_random, None, nick), get_accounts())
+                                pool.map(partial(self.bot_management.change_nick_random, None, nick), DatabaseController().get_bots())
                             print("[ChangeNickname]: Finish.")
                         elif choice == "12":
                             user_link = input("User link: ")
                             userid = self.client.get_from_code(str(user_link.split('/')[-1])).objectId
                             text = input("Text: ")
-                            pool.map(partial(self.bot_management.wall_comment, userid, text), get_accounts())
+                            pool.map(partial(self.bot_management.wall_comment, userid, text), DatabaseController().get_bots())
                             print("[WallComment]: Finish.")
                         elif choice == "13":
                             images = []
@@ -182,7 +197,7 @@ class ServiceApp:
                             for currentFile in currentDirectory.iterdir():
                                 images.append(str(currentFile).split("\\")[2])
                             if images:
-                                pool.map(partial(self.bot_management.change_icon_random, images), get_accounts())
+                                pool.map(partial(self.bot_management.change_icon_random, images), DatabaseController().get_bots())
                             else:
                                 print(colored("icons is empty", "red"))
                             print("[ChangeIcon]: Finish.")
@@ -193,12 +208,12 @@ class ServiceApp:
                             for x, i in enumerate(polls, 1):
                                 print(f"{x}. {i.get('title')}")
                             option = polls[int(input("Select option number: ")) - 1]["polloptId"]
-                            pool.map(partial(self.bot_management.vote_poll, object_id, option), get_accounts())
+                            pool.map(partial(self.bot_management.vote_poll, object_id, option), DatabaseController().get_bots())
                             print("[Vote]: Finish.")
                         elif choice == "15":
                             object_link = input("User link: ")
                             object_id = self.client.get_from_code(str(object_link.split('/')[-1])).objectId
-                            pool.map(partial(self.bot_management.start_chat, object_id), get_accounts())
+                            pool.map(partial(self.bot_management.start_chat, object_id), DatabaseController().get_bots())
                             print("[StartChat]: Finish.")
                         elif choice == "b":
                             break
@@ -266,9 +281,17 @@ class ServiceApp:
                 elif management_choice == "5":
                     logger.debug("Management choice 5")
                     CreateAccounts().run()
+                elif management_choice == "6":
+                    logger.debug("Management choice 6")
+                    bots = DatabaseController().get_bots()
+                    if bots:
+                        for x, i in enumerate(bots, 1):
+                            print(f"{x}. {i}")
+                    else:
+                        print(colored("No bots found in the database", "red"))
                 elif management_choice == "0":
                     logger.debug("Management choice 0")
-                    converter()
+                    convert_from_txt()
             except Exception as e:
                 print(colored(str(e), "red"))
-                logger(traceback.format_exc())
+                logger.debug(traceback.format_exc())

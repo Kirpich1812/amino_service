@@ -1,16 +1,14 @@
-import os
 import json
+import os
 import traceback
+from sys import platform
 
 import requests
-
-from sys import platform
 from colorama import init
 from termcolor import colored
 
 from src.logger import logger
 from src.service import ServiceApp
-
 
 if __name__ == '__main__':
     if platform != "linux":
@@ -36,4 +34,5 @@ if __name__ == '__main__':
         logger.debug("Start service")
         ServiceApp().run()
     except Exception as e:
+        print(e)
         logger.debug(traceback.format_exc())

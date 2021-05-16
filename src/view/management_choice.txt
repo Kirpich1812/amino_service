@@ -7,4 +7,5 @@
 ||- 3. Chat Moderation
 ||- 4. Badass
 ||- 5. Create accounts
+||- 6. Show bots list
 =======================

@@ -1,4 +1,3 @@
-import os
 import random
 from multiprocessing.pool import ThreadPool
 
@@ -53,7 +52,15 @@ class SingleManagement:
                 print(f"Unfollowing: {count}")
 
     def like_recent_blogs(self):
-        comments = open(os.path.join(os.getcwd(), "src", "activity", "comments.txt"), "r", encoding="utf-8").readlines()
+        comments = []
+        x = 0
+        while True:
+            x += 1
+            comment = input(f"Enter your comment text (optional)[{x}]: ")
+            if comment:
+                comments.append(comment)
+            if not comment:
+                break
         count = 0
         old = []
         token = None

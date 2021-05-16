@@ -1,27 +1,25 @@
-import os
 import random
 import time
 import traceback
 from multiprocessing.pool import ThreadPool
 
-import yaml
 from termcolor import colored
 
 import amino
+from src.database import DatabaseController
 from src.logger import service_log, logger
-from src.other import get_accounts
 
 
-def login(account: dict):
+def login(account: tuple):
     client = amino.Client()
-    email = account.get("email")
-    password = account.get("password")
+    email = account[0]
+    password = account[1]
     while True:
         try:
             client.login(email, password)
             return client
         except amino.exceptions.ActionNotAllowed:
-            client.device_id = client.headers.device_id = random.choice(open(os.path.join(os.getcwd(), "src", "devices", "devices.txt"), "r").readlines()).replace("\n", "")
+            client.device_id = client.headers.device_id = random.choice(DatabaseController().get_device_ids())[0]
         except amino.exceptions.FailedLogin:
             service_log(email, "Failed login")
             return False
@@ -46,18 +44,18 @@ def login(account: dict):
             return False
 
 
-def login_sid(account: dict):
+def login_sid(account: tuple):
     client = amino.Client()
-    email = account.get("email")
-    sid = account.get("sid")
-    is_valid = account.get("isValid")
-    if is_valid:
+    email = account[0]
+    sid = account[2]
+    is_valid = account[3]
+    if is_valid == 1:
         while True:
             try:
                 client.login_sid(sid)
                 return client
             except amino.exceptions.ActionNotAllowed:
-                client.device_id = client.headers.device_id = random.choice(open(os.path.join(os.getcwd(), "src", "devices", "devices.txt"), "r").readlines()).replace("\n", "")
+                client.device_id = client.headers.device_id = random.choice(DatabaseController().get_device_ids())[0]
             except amino.exceptions.FailedLogin:
                 service_log(email, "Failed login")
                 return False
@@ -83,17 +81,20 @@ def login_sid(account: dict):
 
 
 def check_accounts():
-    accounts = get_accounts()
+    accounts = DatabaseController().get_bots()
     invalids = []
     bads = []
     for i in accounts:
-        if i.get("isValid") is False:
+        sid = i[2]
+        is_valid = i[3]
+        valid_time = i[4]
+        if is_valid == 0:
             invalids.append(i)
             continue
-        if i.get("sid") is None or i.get("validTime") is None or i.get("isValid") is None:
+        if sid is None or valid_time is None or is_valid is None:
             bads.append(i)
             continue
-        if i.get("validTime") <= int(time.time()):
+        if valid_time <= int(time.time()):
             bads.append(i)
             continue
     if invalids:
@@ -102,13 +103,14 @@ def check_accounts():
         print(f"{len(bads)} accounts require a SID update, start updating...")
         pool = ThreadPool(50)
         valid_list = pool.map(update_sid, bads)
-        with open(os.path.join(os.getcwd(), "src", "accounts", "bots.yaml"), "w") as accounts_file:
-            yaml.dump(valid_list, accounts_file, Dumper=yaml.Dumper)
+        for i in valid_list:
+            DatabaseController().remove_bot(i.get("email"))
+        DatabaseController().set_bots(valid_list)
 
 
-def update_sid(account: dict):
-    email = account.get("email")
-    password = account.get("password")
+def update_sid(account: tuple):
+    email = account[0]
+    password = account[1]
     client = login(account)
     if client:
         return {"email": email, "password": password, "sid": client.sid, "isValid": True, "validTime": int(time.time()) + 43200}
