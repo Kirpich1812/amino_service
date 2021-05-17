@@ -8,7 +8,7 @@ from colorama import init
 from termcolor import colored
 
 from src.logger import logger
-from src.paths import LOGO_VIEW_PATH, ICONS_PATH
+from src.paths import LOGO_VIEW_PATH
 from src.service import ServiceApp
 
 if __name__ == '__main__':
