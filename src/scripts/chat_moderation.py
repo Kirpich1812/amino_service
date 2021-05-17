@@ -5,6 +5,7 @@ from multiprocessing.pool import ThreadPool
 from termcolor import colored
 
 import amino
+from src.paths import CHAT_SETTINGS_PATH
 
 
 class ChatModeration:
@@ -35,9 +36,9 @@ class ChatModeration:
                 print(f"{deleted} messages deleted", end="\r")
 
     def save_chat_settings(self, chatid: str):
-        if not os.path.exists(os.path.join(os.getcwd(), "src", "chat_settings")):
-            os.mkdir(os.path.join(os.getcwd(), "src", "chat_settings"))
-        with open(os.path.join(os.getcwd(), "src", "chat_settings", f"{chatid}.txt"), "w", encoding="utf-8") as settings_file:
+        if not os.path.exists(CHAT_SETTINGS_PATH):
+            os.mkdir(CHAT_SETTINGS_PATH)
+        with open(os.path.join(CHAT_SETTINGS_PATH, f"{chatid}.txt"), "w", encoding="utf-8") as settings_file:
             chat = self.sub_client.get_chat_thread(chatId=chatid)
             data = "====================Title====================\n" \
                    f"{chat.title}\n\n" \
@@ -55,7 +56,7 @@ class ChatModeration:
                 for i in chat.userAddedTopicList:
                     data += f"{i.get('name')}\nColor: {i.get('style').get('backgroundColor')}\n"
             settings_file.write(data)
-        print(colored(f"Settings saved in {os.path.join(os.getcwd(), 'src', 'chat_settings', f'{chatid}.txt')}", "green"))
+        print(colored(f"Settings saved in {os.path.join(CHAT_SETTINGS_PATH, f'{chatid}.txt')}", "green"))
 
     def set_view_mode(self, chatid: str):
         chat = self.sub_client.get_chat_thread(chatId=chatid)

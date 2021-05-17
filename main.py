@@ -8,6 +8,7 @@ from colorama import init
 from termcolor import colored
 
 from src.logger import logger
+from src.paths import LOGO_VIEW_PATH, ICONS_PATH
 from src.service import ServiceApp
 
 if __name__ == '__main__':
@@ -28,7 +29,7 @@ if __name__ == '__main__':
     if __version__ != __newest__:
         print(colored(f"New version of Amino Service available! ({__newest__})\n", "yellow"))
 
-    print(colored(open("src/view/logo.txt", "r").read().replace("v?", __version__).replace("a?", __author__).replace("g?", __github__).replace("_", " "), "green"))
+    print(colored(open(LOGO_VIEW_PATH, "r").read().replace("v?", __version__).replace("a?", __author__).replace("g?", __github__).replace("_", " "), "green"))
 
     try:
         logger.debug("Start service")

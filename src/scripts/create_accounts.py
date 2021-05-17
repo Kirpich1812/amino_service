@@ -6,6 +6,7 @@ from termcolor import colored
 import amino
 from src.database import DatabaseController
 from src.nick_gen import UsernameGenerator
+from src.paths import ACCOUNTS_DIR_PATH, REG_DEVICES_PATH, CREATED_ACCOUNTS_PATH
 
 
 class CreateAccounts:
@@ -20,10 +21,12 @@ class CreateAccounts:
         self.count = 0
 
     def run(self):
-        if not os.path.exists(os.path.join(os.getcwd(), "src", "reg_devices.txt")):
-            print(colored("src > reg_devices.txt not found", "red"))
+        if not os.path.exists(ACCOUNTS_DIR_PATH):
+            os.mkdir(ACCOUNTS_DIR_PATH)
+        if not os.path.exists(REG_DEVICES_PATH):
+            print(colored(REG_DEVICES_PATH + " not found", "red"))
             return
-        reg_devices = open(os.path.join(os.getcwd(), "src", "reg_devices.txt"), "r").readlines()
+        reg_devices = open(REG_DEVICES_PATH, "r").readlines()
         if reg_devices:
             for device in reg_devices:
                 self.client.device_id = self.client.headers.device_id = device.replace("\n", "")
@@ -109,13 +112,13 @@ class CreateAccounts:
                 return False
 
     def save_account(self):
-        with open(os.path.join(os.getcwd(), "src", "created_accounts.txt"), "a") as accounts_file:
+        with open(CREATED_ACCOUNTS_PATH, "a") as accounts_file:
             accounts_file.write(f"{self.email}:{self.password}\n")
-        print(colored(f"{self.email} saved in created_accounts.txt", "green"))
+        print(colored(f"{self.email} saved in " + CREATED_ACCOUNTS_PATH, "green"))
 
     def remove_device(self):
-        devices = open(os.path.join(os.getcwd(), "src", "reg_devices.txt"), "r").readlines()
+        devices = open(REG_DEVICES_PATH, "r").readlines()
         devices.pop(0)
-        with open(os.path.join(os.getcwd(), "src", "reg_devices.txt"), "w") as devices_file:
+        with open(REG_DEVICES_PATH, "w") as devices_file:
             for i in devices:
                 devices_file.write(i)

@@ -6,6 +6,7 @@ from multiprocessing.pool import ThreadPool
 from termcolor import colored
 
 import amino
+import src.paths as paths
 from .converter import convert_from_txt
 from .database import DatabaseController
 from .logger import logger
@@ -67,12 +68,12 @@ class ServiceApp:
     def run(self):
         while True:
             try:
-                print(colored(open("src/view/management_choice.txt", "r").read(), "cyan"))
+                print(colored(open(paths.MANAGEMENT_CHOICE_VIEW_PATH, "r").read(), "cyan"))
                 management_choice = input("Enter the number >>> ")
                 if management_choice == "1":
                     logger.debug("Management choice 1")
                     while True:
-                        print(colored(open("src/view/single_management.txt", "r").read(), "cyan"))
+                        print(colored(open(paths.SINGLE_MANAGEMENT_VIEW_PATH, "r").read(), "cyan"))
                         choice = input("Enter the number >>> ")
                         logger.debug(f"Function choice {choice}")
                         if choice == "1":
@@ -105,7 +106,7 @@ class ServiceApp:
                     check_accounts()
                     pool = ThreadPool(int(input("Number of threads: ")))
                     while True:
-                        print(colored(open("src/view/bot_management.txt", "r").read(), "cyan"))
+                        print(colored(open(paths.BOT_MANAGEMENT_VIEW_PATH, "r").read(), "cyan"))
                         choice = input("Enter the number >>> ")
                         logger.debug(f"Function choice {choice}")
                         if choice == "1":
@@ -193,7 +194,7 @@ class ServiceApp:
                             print("[WallComment]: Finish.")
                         elif choice == "13":
                             images = []
-                            currentDirectory = pathlib.Path('src\\icons')
+                            currentDirectory = pathlib.Path(paths.ICONS_PATH)
                             for currentFile in currentDirectory.iterdir():
                                 images.append(str(currentFile).split("\\")[2])
                             if images:
@@ -220,7 +221,7 @@ class ServiceApp:
                 elif management_choice == "3":
                     logger.debug("Management choice 3")
                     while True:
-                        print(colored(open("src/view/chat_moderation.txt", "r").read(), "cyan"))
+                        print(colored(open(paths.CHAT_MODERATION_VIEW_PATH, "r").read(), "cyan"))
                         choice = input("Enter the number >>> ")
                         logger.debug(f"Function choice {choice}")
                         if choice == "1":
@@ -250,7 +251,7 @@ class ServiceApp:
                 elif management_choice == "4":
                     logger.debug("Management choice 4")
                     while True:
-                        print(colored(open("src/view/badass.txt", "r").read(), "cyan"))
+                        print(colored(open(paths.BADASS_VIEW_PATH, "r").read(), "cyan"))
                         choice = input("Enter the number >>> ")
                         logger.debug(f"Function choice {choice}")
                         if choice == "1":

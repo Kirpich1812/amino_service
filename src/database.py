@@ -1,7 +1,8 @@
-import os
 import sqlite3
 
-DB = sqlite3.connect(os.path.join(os.getcwd(), "src", "database.db"), check_same_thread=False)
+from src.paths import DATABASE_PATH
+
+DB = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
 DB_CURSOR = DB.cursor()
 DB_CURSOR.execute(
     """CREATE TABLE IF NOT EXISTS auth_data (email TEXT, password TEXT)"""

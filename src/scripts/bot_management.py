@@ -5,6 +5,7 @@ import amino
 from src.login import login_sid
 from src.nick_gen import UsernameGenerator
 from src.logger import service_log
+from src.paths import ICONS_PATH
 
 
 class BotManagement:
@@ -224,7 +225,7 @@ class BotManagement:
             return
         sub_client = amino.SubClient(comId=self.com_id, client=client)
         try:
-            icon = client.upload_media(open(os.path.join(os.getcwd(), "src", "icons", f"{random.choice(images)}"), "rb"), "image")
+            icon = client.upload_media(open(os.path.join(ICONS_PATH, f"{random.choice(images)}"), "rb"), "image")
             sub_client.edit_profile(icon=icon)
             service_log(email, "Icon changed")
         except amino.exceptions.YouAreBanned:
