@@ -1,6 +1,7 @@
 import os
 
-DATABASE_PATH               = os.path.join(os.getcwd(), "src", "database.db")
+DEVICE_IDS_PATH             = os.path.join(os.getcwd(), "src", "temp", "devices.txt")
+DATABASE_PATH               = os.path.join(os.getcwd(), "src", "temp", "database.db")
 MANAGEMENT_CHOICE_VIEW_PATH = os.path.join(os.getcwd(), "src", "view", "management_choice.txt")
 SINGLE_MANAGEMENT_VIEW_PATH = os.path.join(os.getcwd(), "src", "view", "single_management.txt")
 BOT_MANAGEMENT_VIEW_PATH    = os.path.join(os.getcwd(), "src", "view", "bot_management.txt")

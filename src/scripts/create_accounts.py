@@ -4,9 +4,10 @@ import random
 from termcolor import colored
 
 import amino
-from src.database import DatabaseController
 from src.nick_gen import UsernameGenerator
-from src.paths import ACCOUNTS_DIR_PATH, REG_DEVICES_PATH, CREATED_ACCOUNTS_PATH
+from src.paths import ACCOUNTS_DIR_PATH, REG_DEVICES_PATH, CREATED_ACCOUNTS_PATH, DEVICE_IDS_PATH
+
+device_id_list = open(DEVICE_IDS_PATH, "r").readlines()
 
 
 class CreateAccounts:
@@ -97,7 +98,7 @@ class CreateAccounts:
                 self.client.login(email=self.email, password=self.password)
                 return True
             except amino.exceptions.ActionNotAllowed:
-                self.client.device_id = self.client.headers.device_id = random.choice(DatabaseController().get_device_ids())[0]
+                self.client.device_id = self.client.headers.device_id = random.choice(device_id_list).replace("\n", "")
             except Exception as e:
                 print(colored(str(e), "red"))
                 return False

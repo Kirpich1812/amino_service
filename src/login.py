@@ -8,6 +8,9 @@ from termcolor import colored
 import amino
 from src.database import DatabaseController
 from src.logger import service_log, logger
+from src.paths import DEVICE_IDS_PATH
+
+device_id_list = open(DEVICE_IDS_PATH, "r").readlines()
 
 
 def login(account: tuple):
@@ -19,7 +22,7 @@ def login(account: tuple):
             client.login(email, password)
             return client
         except amino.exceptions.ActionNotAllowed:
-            client.device_id = client.headers.device_id = random.choice(DatabaseController().get_device_ids())[0]
+            client.device_id = client.headers.device_id = random.choice(device_id_list).replace("\n", "")
         except amino.exceptions.FailedLogin:
             service_log(email, "Failed login")
             return False
@@ -55,7 +58,7 @@ def login_sid(account: tuple):
                 client.login_sid(sid)
                 return client
             except amino.exceptions.ActionNotAllowed:
-                client.device_id = client.headers.device_id = random.choice(DatabaseController().get_device_ids())[0]
+                client.device_id = client.headers.device_id = random.choice(device_id_list).replace("\n", "")
             except amino.exceptions.FailedLogin:
                 service_log(email, "Failed login")
                 return False

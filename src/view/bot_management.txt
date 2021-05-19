@@ -2,6 +2,7 @@
 ||      Menu      ||
 ====================
 ||- b. Back
+||- s. Show bots list
 ||- 1. Play lottery
 ||- 2. Send coins
 ||- 3. Like blog

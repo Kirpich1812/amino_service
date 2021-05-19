@@ -6,6 +6,7 @@ from multiprocessing.pool import ThreadPool
 from termcolor import colored
 
 import amino
+from prettytable import from_db_cursor
 import src.paths as paths
 from .converter import convert_from_txt
 from .database import DatabaseController
@@ -109,7 +110,15 @@ class ServiceApp:
                         print(colored(open(paths.BOT_MANAGEMENT_VIEW_PATH, "r").read(), "cyan"))
                         choice = input("Enter the number >>> ")
                         logger.debug(f"Function choice {choice}")
-                        if choice == "1":
+                        if choice == "s":
+                            logger.debug("Management choice s")
+                            bots = DatabaseController().get_bots_cursor()
+                            if bots:
+                                mytable = from_db_cursor(bots)
+                                print(mytable)
+                            else:
+                                print(colored("No bots found in the database", "red"))
+                        elif choice == "1":
                             result = pool.map(self.bot_management.play_lottery, DatabaseController().get_bots())
                             total_count = 0
                             total_accounts = 0
@@ -282,17 +291,13 @@ class ServiceApp:
                 elif management_choice == "5":
                     logger.debug("Management choice 5")
                     CreateAccounts().run()
-                elif management_choice == "6":
-                    logger.debug("Management choice 6")
-                    bots = DatabaseController().get_bots()
-                    if bots:
-                        for x, i in enumerate(bots, 1):
-                            print(f"{x}. {i}")
-                    else:
-                        print(colored("No bots found in the database", "red"))
                 elif management_choice == "0":
                     logger.debug("Management choice 0")
                     convert_from_txt()
+                elif management_choice == "d":
+                    logger.debug("Management choice d")
+                    email = input("Bot login: ")
+                    DatabaseController().remove_bot(email)
             except Exception as e:
                 print(colored(str(e), "red"))
                 logger.debug(traceback.format_exc())

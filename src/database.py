@@ -8,9 +8,6 @@ DB_CURSOR.execute(
     """CREATE TABLE IF NOT EXISTS auth_data (email TEXT, password TEXT)"""
 )
 DB_CURSOR.execute(
-    """CREATE TABLE IF NOT EXISTS devices (device_id TEXT)"""
-)
-DB_CURSOR.execute(
     """CREATE TABLE IF NOT EXISTS bots (email TEXT, password TEXT, sid TEXT, is_valid INTEGER, valid_time INTEGER)"""
 )
 DB.commit()
@@ -27,27 +24,24 @@ class DatabaseController:
         DB_CURSOR.execute("""SELECT * FROM auth_data""")
         return DB_CURSOR.fetchall()
 
-    def get_device_ids(self):
-        DB_CURSOR.execute("""SELECT * FROM devices""")
-        return DB_CURSOR.fetchall()
-
     def get_bots(self):
         DB_CURSOR.execute("""SELECT * FROM bots""")
         return DB_CURSOR.fetchall()
 
-    def set_device_id(self, device_id: str):
-        DB_CURSOR.execute("""INSERT INTO devices VALUES (?)""", (device_id,))
-        DB.commit()
+    def get_bots_cursor(self):
+        DB_CURSOR.execute("""SELECT * FROM bots""")
+        return DB_CURSOR
 
     def set_bots(self, accounts: list):
-        for i in accounts:
-            email = i.get("email")
-            password = i.get("password")
-            sid = i.get("sid")
-            is_valid = i.get("isValid")
-            valid_time = i.get("validTime")
-            DB_CURSOR.execute("""INSERT INTO bots VALUES (?, ?, ?, ?, ?)""", (email, password, sid, is_valid, valid_time))
-        DB.commit()
+        if accounts:
+            for i in accounts:
+                email = i.get("email")
+                password = i.get("password")
+                sid = i.get("sid")
+                is_valid = i.get("isValid")
+                valid_time = i.get("validTime")
+                DB_CURSOR.execute("""INSERT INTO bots VALUES (?, ?, ?, ?, ?)""", (email, password, sid, is_valid, valid_time))
+            DB.commit()
 
     def remove_account(self, email: str):
         DB_CURSOR.execute("""DELETE FROM auth_data WHERE email=?""", (email,))

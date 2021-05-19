@@ -15,5 +15,8 @@ def convert_from_txt():
     if bots:
         for i in bots:
             split = i.replace(" ", "").replace("\n", "").split(":")
-            accounts.append({"email": split[0], "password": split[1]})
+            try:
+                accounts.append({"email": split[0], "password": split[1]})
+            except IndexError:
+                pass
         DatabaseController().set_bots(accounts)
