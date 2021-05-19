@@ -15,6 +15,8 @@ logger.addHandler(fh)
 
 if DatabaseController().get_bots():
     spaces = max([len(i[0]) for i in DatabaseController().get_bots()])
+else:
+    spaces = 25
 
 
 def service_log(email: str, action: str):
