@@ -3,12 +3,10 @@ import time
 import traceback
 from multiprocessing.pool import ThreadPool
 
-from termcolor import colored
-
 import amino
-from src.database import DatabaseController
-from src.logger import service_log, logger
-from src.paths import DEVICE_IDS_PATH
+from src.utils.database import DatabaseController
+from src.utils.logger import service_align, logger, file_logger
+from src.utils.paths import DEVICE_IDS_PATH
 
 device_id_list = open(DEVICE_IDS_PATH, "r").readlines()
 
@@ -23,27 +21,12 @@ def login(account: tuple):
             return client
         except amino.exceptions.ActionNotAllowed:
             client.device_id = client.headers.device_id = random.choice(device_id_list).replace("\n", "")
-        except amino.exceptions.FailedLogin:
-            service_log(email, "Failed login")
-            return False
-        except amino.exceptions.InvalidAccountOrPassword:
-            service_log(email, "Invalid account or password")
-            return False
-        except amino.exceptions.InvalidPassword:
-            service_log(email, "Invalid Password")
-            return False
-        except amino.exceptions.InvalidEmail:
-            service_log(email, "Invalid Email")
-            return False
-        except amino.exceptions.AccountDoesntExist:
-            service_log(email, "Account does not exist")
-            return False
         except amino.exceptions.VerificationRequired as verify:
-            service_log(email, str(verify))
+            logger.error("[" + email + "]: " + str(verify.args[0]["url"]))
             return False
         except Exception as e:
-            service_log(email, str(e))
-            logger.debug(traceback.format_exc())
+            logger.error("[" + email + "]: " + e.args[0]["api:message"])
+            file_logger.debug(traceback.format_exc())
             return False
 
 
@@ -59,27 +42,12 @@ def login_sid(account: tuple):
                 return client
             except amino.exceptions.ActionNotAllowed:
                 client.device_id = client.headers.device_id = random.choice(device_id_list).replace("\n", "")
-            except amino.exceptions.FailedLogin:
-                service_log(email, "Failed login")
-                return False
-            except amino.exceptions.InvalidAccountOrPassword:
-                service_log(email, "Invalid account or password")
-                return False
-            except amino.exceptions.InvalidPassword:
-                service_log(email, "Invalid Password")
-                return False
-            except amino.exceptions.InvalidEmail:
-                service_log(email, "Invalid Email")
-                return False
-            except amino.exceptions.AccountDoesntExist:
-                service_log(email, "Account does not exist")
-                return False
             except amino.exceptions.VerificationRequired as verify:
-                service_log(email, str(verify))
+                logger.error(service_align(email, verify.args[0]["url"]))
                 return False
             except Exception as e:
-                service_log(email, str(e))
-                logger(traceback.format_exc())
+                logger.error(service_align(email, e.args[0]["api:message"]))
+                file_logger.debug(traceback.format_exc())
                 return False
 
 
@@ -101,9 +69,9 @@ def check_accounts():
             bads.append(i)
             continue
     if invalids:
-        print(colored(f"{len(invalids)} invalid accounts", "red"))
+        logger.warning(f"{len(invalids)} invalid accounts")
     if bads:
-        print(f"{len(bads)} accounts require a SID update, start updating...")
+        logger.warning(f"{len(bads)} accounts require a SID update, start updating...")
         pool = ThreadPool(50)
         valid_list = pool.map(update_sid, bads)
         for i in valid_list:

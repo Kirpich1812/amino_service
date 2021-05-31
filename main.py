@@ -7,8 +7,8 @@ import requests
 from colorama import init
 from termcolor import colored
 
-from src.logger import logger
-from src.paths import LOGO_VIEW_PATH
+from src.utils.logger import logger, file_logger
+from src.utils.paths import LOGO_VIEW_PATH
 from src.service import ServiceApp
 
 if __name__ == '__main__':
@@ -21,19 +21,19 @@ if __name__ == '__main__':
     with open("version.json") as info_file:
         info = json.load(info_file)
 
-    __version__ = info["version"]
-    __author__  = info["author"]
-    __github__  = info["github"]
-    __newest__  = json.loads(requests.get("https://github.com/LynxN1/amino_service/raw/master/version.json").text)["version"]
+    __version__   = info["version"]
+    __author__    = info["author"]
+    __github__    = info["github"]
+    __telegram__  = info["telegram"]
+    __newest__    = json.loads(requests.get("https://github.com/LynxN1/amino_service/raw/master/version.json").text)["version"]
 
     if __version__ != __newest__:
-        print(colored(f"New version of Amino Service available! ({__newest__})\n", "yellow"))
+        logger.warning(f"New version of Amino Service available! ({__newest__})\n")
 
-    print(colored(open(LOGO_VIEW_PATH, "r").read().replace("v?", __version__).replace("a?", __author__).replace("g?", __github__).replace("_", " "), "green"))
+    logger.info(colored(open(LOGO_VIEW_PATH, "r").read().replace("v?", __version__).replace("a?", __author__).replace("g?", __github__).replace("_", " ").replace("t?", __telegram__), "green"))
 
     try:
-        logger.debug("Start service")
         ServiceApp().run()
     except Exception as e:
-        print(e)
-        logger.debug(traceback.format_exc())
+        logger.error(e)
+        file_logger.debug(traceback.format_exc())

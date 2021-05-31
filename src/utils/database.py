@@ -1,6 +1,6 @@
 import sqlite3
 
-from src.paths import DATABASE_PATH
+from src.utils.paths import DATABASE_PATH
 
 DB = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
 DB_CURSOR = DB.cursor()

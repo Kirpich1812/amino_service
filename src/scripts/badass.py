@@ -1,54 +1,52 @@
+from functools import partial
 from multiprocessing.pool import ThreadPool
 
-from termcolor import colored
-
 import amino
+from src.utils.logger import lifecycle_logger, logger
 
 
 class Badass:
     def __init__(self, sub_client: amino.SubClient):
         self.sub_client = sub_client
 
+    @lifecycle_logger
     def send_system_message(self, chatid: str):
         self.sub_client.join_chat(chatid)
         while True:
             message_type = int(input("Message type: "))
-            message = input("Message: ")
-            try:
-                self.sub_client.send_message(chatId=chatid, messageType=message_type, message=message)
-                print("Message sent")
-            except amino.exceptions.ChatViewOnly:
-                print(colored("Chat is in only view mode", "red"))
-            except:
-                pass
+            message = input("Message text: ")
+            self.sub_client.send_message(chatId=chatid, messageType=message_type, message=message)
+            logger.info("Message sent")
             choice = input("Repeat?(y/n): ")
             if choice.lower() == "n":
                 break
 
+    @lifecycle_logger
     def spam_system_message(self, chatid: str):
         pool_count = int(input("Number of threads: "))
         pool = ThreadPool(pool_count)
         count_messages = int(input("Count of messages: "))
         message_type = int(input("Message type: "))
-        message = input("Message: ")
+        message = input("Message text: ")
         self.sub_client.join_chat(chatid)
         while True:
-            for _ in range(count_messages):
-                print("Message sent")
-                pool.apply_async(self.sub_client.send_message, [chatid, message, message_type])
+            logger.info("Spam has been started...")
+            pool.map(partial(self.sub_client.send_message, chatid, message), [message_type] * count_messages)
             choice = input("Repeat?(y/n): ")
             if choice.lower() == "n":
                 break
 
+    @lifecycle_logger
     def delete_chat(self, chatid: str):
         chat = self.sub_client.get_chat_thread(chatId=chatid)
         admins = [*chat.coHosts, chat.author.userId]
         if self.sub_client.profile.userId in admins:
             self.sub_client.kick(chatId=chatid, allowRejoin=False, userId=chat.author.userId)
-            print("Chat deleted")
+            logger.info("Chat deleted")
         else:
-            print(colored("You don't have co-host/host rights to use this function", "red"))
+            logger.error("You don't have co-host/host rights to use this function")
 
+    @lifecycle_logger
     def invite_all_users(self, chatid: str):
         pool = ThreadPool(100)
         count = 0
@@ -59,9 +57,10 @@ class Badass:
             for userid in users:
                 pool.apply_async(self.sub_client.invite_to_chat, [userid, chatid])
                 count += 1
-                print(f"{count} users invited to chat", end="\r")
-        print("All online users invited to chat")
+                logger.info(f"{count} users invited to chat")
+        logger.info("All online users invited to chat")
 
+    @lifecycle_logger
     def spam_posts(self):
         pool_count = int(input("Number of threads: "))
         pool = ThreadPool(pool_count)
@@ -70,7 +69,7 @@ class Badass:
         content = input("Post content: ")
         while True:
             for i in range(posts_count):
-                print("Post sent")
+                logger.info("Post sent")
                 pool.apply_async(self.sub_client.post_blog, [title, content])
             choice = input("Repeat?(y/n): ")
             if choice.lower() == "n":

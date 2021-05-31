@@ -1,11 +1,10 @@
 import os
 import random
 
-from termcolor import colored
-
 import amino
-from src.nick_gen import UsernameGenerator
-from src.paths import ACCOUNTS_DIR_PATH, REG_DEVICES_PATH, CREATED_ACCOUNTS_PATH, DEVICE_IDS_PATH
+from src.utils.logger import lifecycle_logger, logger
+from src.utils.nick_gen import UsernameGenerator
+from src.utils.paths import ACCOUNTS_DIR_PATH, REG_DEVICES_PATH, CREATED_ACCOUNTS_PATH, DEVICE_IDS_PATH
 
 device_id_list = open(DEVICE_IDS_PATH, "r").readlines()
 
@@ -16,16 +15,17 @@ class CreateAccounts:
         self.email = None
         self.password = input("Set a password for all accounts: ")
         while len(self.password) < 6:
-            print(colored("Password must be at least 6 characters long", "red"))
+            logger.error("Password must be at least 6 characters long")
             self.password = input("Set a password for all accounts: ")
         self.code = None
         self.count = 0
 
+    @lifecycle_logger
     def run(self):
         if not os.path.exists(ACCOUNTS_DIR_PATH):
             os.mkdir(ACCOUNTS_DIR_PATH)
         if not os.path.exists(REG_DEVICES_PATH):
-            print(colored(REG_DEVICES_PATH + " not found", "red"))
+            logger.error(REG_DEVICES_PATH + " not found")
             return
         reg_devices = open(REG_DEVICES_PATH, "r").readlines()
         if reg_devices:
@@ -40,7 +40,7 @@ class CreateAccounts:
                                 if self.activate():
                                     self.save_account()
                                     self.count += 1
-                                    print(f"{self.count} accounts registered")
+                                    logger.info(f"{self.count} accounts registered")
                                 else:
                                     continue
                             else:
@@ -51,7 +51,7 @@ class CreateAccounts:
                         continue
                 self.remove_device()
         else:
-            print(colored("reg_devices.txt is empty", "red"))
+            logger.error("reg_devices.txt is empty")
 
     def register(self):
         while True:
@@ -59,25 +59,10 @@ class CreateAccounts:
                 nick = UsernameGenerator(2, 10).generate()
                 self.client.register(nickname=nick, email=self.email, password=str(self.password))
                 return True
-            except amino.exceptions.AccountLimitReached:
-                print(colored("AccountLimitReached", "red"))
-                return False
-            except amino.exceptions.InvalidEmail:
-                print(colored("Invalid Email", "red"))
-                return False
-            except amino.exceptions.EmailAlreadyTaken:
-                print(colored("EmailAlreadyTaken", "red"))
-                self.email = input("Email: ")
-            except amino.exceptions.UnsupportedEmail:
-                print(colored("UnsupportedEmail", "red"))
-                return False
-            except amino.exceptions.CommandCooldown:
-                print(colored("CommandCooldown", "red"))
-                return False
             except amino.exceptions.VerificationRequired as e:
-                input("Open this link in a browser and click the checkmark: " + str(e) + "\n\npress ENTER to continue...")
+                input("Open this link in a browser and click the checkmark: " + e.args[0]["url"] + "\n\npress ENTER to continue...")
             except Exception as e:
-                print(colored(str(e), "red"))
+                logger.error(e.args[0]["api:message"])
                 return False
 
     def verify(self):
@@ -86,10 +71,8 @@ class CreateAccounts:
             try:
                 self.client.verify(email=self.email, code=self.code)
                 return True
-            except amino.exceptions.IncorrectVerificationCode:
-                print(colored("IncorrectVerificationCode", "red"))
             except Exception as e:
-                print(colored(str(e), "red"))
+                logger.error(e.args[0]["api:message"])
                 return False
 
     def login(self):
@@ -100,7 +83,7 @@ class CreateAccounts:
             except amino.exceptions.ActionNotAllowed:
                 self.client.device_id = self.client.headers.device_id = random.choice(device_id_list).replace("\n", "")
             except Exception as e:
-                print(colored(str(e), "red"))
+                logger.error(e.args[0]["api:message"])
                 return False
 
     def activate(self):
@@ -109,13 +92,13 @@ class CreateAccounts:
                 self.client.activate_account(email=self.email, code=self.code)
                 return True
             except Exception as e:
-                print(colored(str(e), "red"))
+                logger.error(e.args[0]["api:message"])
                 return False
 
     def save_account(self):
         with open(CREATED_ACCOUNTS_PATH, "a") as accounts_file:
             accounts_file.write(f"{self.email}:{self.password}\n")
-        print(colored(f"{self.email} saved in " + CREATED_ACCOUNTS_PATH, "green"))
+        logger.info(f"{self.email} saved in " + CREATED_ACCOUNTS_PATH)
 
     def remove_device(self):
         devices = open(REG_DEVICES_PATH, "r").readlines()

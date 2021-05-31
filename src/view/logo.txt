@@ -13,3 +13,4 @@ $$$$$__$$$$$_$$__$$___$$___$$$$$$__$$$$__$$$$$
 Author    a?
 Version   v?
 Github    g?
+Telegram  t?

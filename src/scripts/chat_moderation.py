@@ -2,17 +2,18 @@ import os
 import time
 from multiprocessing.pool import ThreadPool
 
-from termcolor import colored
-
 import amino
-from src.paths import CHAT_SETTINGS_PATH
+from src.utils.logger import lifecycle_logger, logger
+from src.utils.paths import CHAT_SETTINGS_PATH
 
 
 class ChatModeration:
     def __init__(self, sub_client: amino.SubClient):
         self.sub_client = sub_client
 
-    def clear_chat(self, chatid: str, count: int):
+    @lifecycle_logger
+    def clear_chat(self, chatid: str):
+        count = int(input("Number of messages: "))
         pool = ThreadPool(50)
         deleted = 0
         next_page = None
@@ -20,7 +21,7 @@ class ChatModeration:
         chat = self.sub_client.get_chat_thread(chatId=chatid)
         admins = [*chat.coHosts, chat.author.userId]
         if self.sub_client.profile.userId not in admins:
-            print(colored("You don't have co-host/host rights to use this function", "red"))
+            logger.error("You don't have co-host/host rights to use this function")
             return
         while not back:
             messages = self.sub_client.get_chat_messages(chatId=chatid, size=100, pageToken=next_page)
@@ -33,8 +34,9 @@ class ChatModeration:
                     break
                 pool.apply_async(self.sub_client.delete_message, [chatid, message_id, False, None])
                 deleted += 1
-                print(f"{deleted} messages deleted", end="\r")
+                logger.info(f"{deleted} messages deleted")
 
+    @lifecycle_logger
     def save_chat_settings(self, chatid: str):
         if not os.path.exists(CHAT_SETTINGS_PATH):
             os.mkdir(CHAT_SETTINGS_PATH)
@@ -56,28 +58,31 @@ class ChatModeration:
                 for i in chat.userAddedTopicList:
                     data += f"{i.get('name')}\nColor: {i.get('style').get('backgroundColor')}\n"
             settings_file.write(data)
-        print(colored(f"Settings saved in {os.path.join(CHAT_SETTINGS_PATH, f'{chatid}.txt')}", "green"))
+        logger.info(f"Settings saved in {os.path.join(CHAT_SETTINGS_PATH, f'{chatid}.txt')}")
 
+    @lifecycle_logger
     def set_view_mode(self, chatid: str):
         chat = self.sub_client.get_chat_thread(chatId=chatid)
         admins = [*chat.coHosts, chat.author.userId]
         if self.sub_client.profile.userId in admins:
             self.sub_client.edit_chat(chatId=chatid, viewOnly=True)
-            print("Chat mode is set to view")
+            logger.info("Chat mode is set to view")
         else:
-            print(colored("You don't have co-host/host rights to use this function", "red"))
+            logger.error("You don't have co-host/host rights to use this function")
 
-    def set_view_mode_timer(self, chatid: str, duration: int):
+    @lifecycle_logger
+    def set_view_mode_timer(self, chatid: str):
+        duration = int(input("Duration in seconds: "))
         chat = self.sub_client.get_chat_thread(chatId=chatid)
         admins = [*chat.coHosts, chat.author.userId]
         if self.sub_client.profile.userId in admins:
             self.sub_client.edit_chat(chatId=chatid, viewOnly=True)
-            print("Chat mode is set to view")
+            logger.info("Chat mode is set to view")
             while duration > 0:
-                print(f"{duration} seconds left", end="\r")
+                logger.info(f"{duration} seconds left")
                 duration -= 1
                 time.sleep(1)
             self.sub_client.edit_chat(chatId=chatid, viewOnly=False)
-            print("View mode disabled")
+            logger.info("View mode disabled")
         else:
-            print(colored("You don't have co-host/host rights to use this function", "red"))
+            logger.error("You don't have co-host/host rights to use this function")

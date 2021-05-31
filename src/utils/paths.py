@@ -1,5 +1,6 @@
 import os
 
+LOG_FILE_PATH               = os.path.join(os.getcwd(), "log.log")
 DEVICE_IDS_PATH             = os.path.join(os.getcwd(), "src", "temp", "devices.txt")
 DATABASE_PATH               = os.path.join(os.getcwd(), "src", "temp", "database.db")
 MANAGEMENT_CHOICE_VIEW_PATH = os.path.join(os.getcwd(), "src", "view", "management_choice.txt")

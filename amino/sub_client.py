@@ -17,7 +17,7 @@ class SubClient:
         self.comId = comId
 
         try:
-            self.profile: objects.UserProfile = self.get_user_info(userId=self.client.userId)
+            self.profile = self.client.profile
         except AttributeError:
             raise exceptions.FailedLogin()
         except exceptions.UserUnavailable:

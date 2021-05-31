@@ -1,14 +1,13 @@
 import os
 
-from termcolor import colored
-
-from src.database import DatabaseController
-from src.paths import BOTS_TXT_PATH
+from src.utils.database import DatabaseController
+from src.utils.logger import logger
+from src.utils.paths import BOTS_TXT_PATH
 
 
 def convert_from_txt():
     if not os.path.exists(os.path.join(BOTS_TXT_PATH)):
-        print(colored(BOTS_TXT_PATH + " not found", "red"))
+        logger.error(BOTS_TXT_PATH + " not found")
         return
     bots = open(BOTS_TXT_PATH, "r").readlines()
     accounts = []
