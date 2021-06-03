@@ -87,10 +87,10 @@ class ServiceApp:
                         elif choice == "5":
                             self.single_management.get_blocker_users()
                         elif choice == "6":
-                            count = input("Number of coins: ")
+                            coins_count = input("Number of coins: ")
                             blog_link = input("Blog link: ")
                             object_id = self.client.get_from_code(str(blog_link.split('/')[-1])).objectId
-                            self.single_management.send_coins(int(count), object_id)
+                            self.single_management.send_coins(int(coins_count), object_id)
                         elif choice == "b":
                             break
                 elif management_choice == "2":
