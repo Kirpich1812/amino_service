@@ -178,8 +178,8 @@ class ServiceApp:
                             text = input("Text: ")
                             pool.map(partial(self.bot_management.wall_comment, userid, text), self.database.get_bots())
                         elif choice == "13":
-                            currentDirectory = pathlib.Path(paths.ICONS_PATH)
-                            images = [x.name for x in currentDirectory.iterdir()]
+                            current_directory = pathlib.Path(paths.ICONS_PATH)
+                            images = [x.name for x in current_directory.iterdir()]
                             if images:
                                 pool.map(partial(self.bot_management.change_icon_random, images), self.database.get_bots())
                             else:
