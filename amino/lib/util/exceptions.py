@@ -325,7 +325,7 @@ class InvalidVoiceNote(Exception):
 class RequestedNoLongerExists(Exception):
     """
     - **API Code** : 500, 700, 1600
-    - **API Message** : Sorry, the requested data no longer exists. Try refreshing the view.
+    - **API Message** : Sorry, the requested data no longer exists. Try refreshing the logo.
     - **API String** : ``Unknown String``
     """
     def __init__(*args, **kwargs):
@@ -496,7 +496,7 @@ class ChatViewOnly(Exception):
 class InviteCodeNotFound(Exception):
     """
     - **API Code** : 1900
-    - **API Message** : Sorry, the requested data no longer exists. Try refreshing the view.
+    - **API Message** : Sorry, the requested data no longer exists. Try refreshing the logo.
     - **API String** : ``Unknown String``
     """
     def __init__(*args, **kwargs):

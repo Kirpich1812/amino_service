@@ -1,15 +1,46 @@
 import random
+import traceback
 from multiprocessing.pool import ThreadPool
 
+from termcolor import colored
+
 import amino
-from src.utils.logger import lifecycle_logger, logger
+from src.utils.configs import MAIN_ACCOUNT_MENU
+from src.utils.logger import exception_handler, logger, file_logger
+from src.utils.table import create_table
 
 
 class SingleManagement:
     def __init__(self, sub_client: amino.SubClient):
         self.sub_client = sub_client
+        while True:
+            try:
+                logger.info(colored(create_table("Main Account", MAIN_ACCOUNT_MENU), "cyan"))
+                choice = input("Select action >>> ")
+                if choice == "1":
+                    quiz_link = input("Quiz link: ")
+                    object_id = self.sub_client.client.get_from_code(str(quiz_link.split('/')[-1])).objectId
+                    self.play_quiz(object_id)
+                if choice == "2":
+                    self.like_recent_blogs()
+                if choice == "3":
+                    self.follow_all()
+                if choice == "4":
+                    self.unfollow_all()
+                if choice == "5":
+                    self.get_blocker_users()
+                if choice == "6":
+                    coins_count = input("Number of coins: ")
+                    blog_link = input("Blog link: ")
+                    object_id = self.sub_client.client.get_from_code(str(blog_link.split('/')[-1])).objectId
+                    self.send_coins(int(coins_count), object_id)
+                if choice == "b":
+                    break
+            except Exception as e:
+                logger.error(str(e))
+                file_logger.debug(traceback.format_exc())
 
-    @lifecycle_logger
+    @exception_handler
     def play_quiz(self, object_id: str):
         questions_list = []
         answers_list = []
@@ -38,7 +69,7 @@ class SingleManagement:
         logger.info(f"[quiz]: Passed the quiz!")
         logger.info(f"[quiz]: Score: {self.sub_client.get_quiz_rankings(quizId=object_id).profile.highestScore}")
 
-    @lifecycle_logger
+    @exception_handler
     def unfollow_all(self):
         pool_count = int(input("Number of threads: "))
         thread_pool = ThreadPool(pool_count)
@@ -54,7 +85,7 @@ class SingleManagement:
                 count += 1
                 logger.info(f"Unfollowing: {count}")
 
-    @lifecycle_logger
+    @exception_handler
     def like_recent_blogs(self):
         comments = []
         x = 0
@@ -86,7 +117,7 @@ class SingleManagement:
                 except:
                     pass
 
-    @lifecycle_logger
+    @exception_handler
     def follow_all(self):
         old = []
         pool = ThreadPool(100)
@@ -135,20 +166,18 @@ class SingleManagement:
                     count += len(users)
                     logger.info(f"Follow to {count} users")
 
-    @lifecycle_logger
+    @exception_handler
     def get_blocker_users(self):
         users = self.sub_client.get_blocker_users(start=0, size=100)
         if not users:
             return
-        for x, i in enumerate(users, 1):
+        for i in users:
             user = self.sub_client.get_user_info(i)
-            logger.info(f"{x}.")
             logger.info(f"Userid: {i}")
             logger.info(f"Nickname: {user.nickname}")
-            logger.info(f"Lvl: {user.level}")
-            logger.info()
+            logger.info("")
 
-    @lifecycle_logger
+    @exception_handler
     def send_coins(self, count: int, blog_id: str):
         pool = ThreadPool(3)
         if count <= 500:

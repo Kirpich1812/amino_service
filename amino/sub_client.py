@@ -6,7 +6,6 @@ from time import time as timestamp
 from time import timezone
 from typing import BinaryIO
 from uuid import UUID
-
 from .lib.util import exceptions, objects
 from .request_handler import get, post, delete
 
@@ -26,7 +25,7 @@ class SubClient:
     def get_invite_codes(self, status: str = "normal", start: int = 0, size: int = 25):
         response = get(
             f"{self.client.api}/g/s-x{self.comId}/community/invitation?status={status}&start={start}&size={size}",
-            headers=self.client.headers.headers(), )
+            headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -48,7 +47,7 @@ class SubClient:
 
     def delete_invite_code(self, inviteId: str):
         response = delete(f"{self.client.api}/g/s-x{self.comId}/community/invitation/{inviteId}",
-                          headers=self.client.headers.headers(),)
+                          headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -142,14 +141,14 @@ class SubClient:
             return response.status_code
 
     def delete_blog(self, blogId: str):
-        response = delete(f"{self.client.api}/x{self.comId}/s/blog/{blogId}", headers=self.client.headers.headers(),)
+        response = delete(f"{self.client.api}/x{self.comId}/s/blog/{blogId}", headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
             return response.status_code
 
     def delete_wiki(self, wikiId: str):
-        response = delete(f"{self.client.api}/x{self.comId}/s/item/{wikiId}", headers=self.client.headers.headers(),)
+        response = delete(f"{self.client.api}/x{self.comId}/s/item/{wikiId}", headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -276,19 +275,19 @@ class SubClient:
             data["eventSource"] = "UserProfileView"
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/user-profile/{userId}/{comType}",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif blogId:
             data["eventSource"] = "PostDetailView"
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/blog/{blogId}/{comType}",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif wikiId:
             data["eventSource"] = "PostDetailView"
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/item/{wikiId}/{comType}",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         else:
             raise exceptions.SpecifyType()
@@ -300,16 +299,13 @@ class SubClient:
     def delete_comment(self, commentId: str, userId: str = None, blogId: str = None, wikiId: str = None):
         if userId:
             response = delete(f"{self.client.api}/x{self.comId}/s/user-profile/{userId}/comment/{commentId}",
-                              headers=self.client.headers.headers(),
-)
+                              headers=self.client.headers.headers())
         elif blogId:
             response = delete(f"{self.client.api}/x{self.comId}/s/blog/{blogId}/comment/{commentId}",
-                              headers=self.client.headers.headers(),
-)
+                              headers=self.client.headers.headers())
         elif wikiId:
             response = delete(f"{self.client.api}/x{self.comId}/s/item/{wikiId}/comment/{commentId}",
-                              headers=self.client.headers.headers(),
-)
+                              headers=self.client.headers.headers())
         else:
             raise exceptions.SpecifyType()
 
@@ -342,16 +338,14 @@ class SubClient:
                 data = json.dumps(data)
                 response = post(f"{self.client.api}/x{self.comId}/s/blog/{blogId}/vote?cv=1.2",
                                 headers=self.client.headers.headers(data=data), data=data,
-
-)
+                                )
 
             elif isinstance(blogId, list):
                 data["targetIdList"] = blogId
                 data = json.dumps(data)
                 response = post(f"{self.client.api}/x{self.comId}/s/feed/vote",
                                 headers=self.client.headers.headers(data=data), data=data,
-
-)
+                                )
 
             else:
                 raise exceptions.WrongType
@@ -360,7 +354,7 @@ class SubClient:
             data["eventSource"] = "PostDetailView"
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/item/{wikiId}/vote?cv=1.2",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         else:
             raise exceptions.SpecifyType()
@@ -372,12 +366,10 @@ class SubClient:
     def unlike_blog(self, blogId: str = None, wikiId: str = None):
         if blogId:
             response = delete(f"{self.client.api}/x{self.comId}/s/blog/{blogId}/vote?eventSource=UserProfileView",
-                              headers=self.client.headers.headers(),
-)
+                              headers=self.client.headers.headers())
         elif wikiId:
             response = delete(f"{self.client.api}/x{self.comId}/s/item/{wikiId}/vote?eventSource=PostDetailView",
-                              headers=self.client.headers.headers(),
-)
+                              headers=self.client.headers.headers())
         else:
             raise exceptions.SpecifyType()
 
@@ -427,15 +419,15 @@ class SubClient:
         if userId:
             response = delete(
                 f"{self.client.api}/x{self.comId}/s/user-profile/{userId}/comment/{commentId}/g-vote?eventSource=UserProfileView",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         elif blogId:
             response = delete(
                 f"{self.client.api}/x{self.comId}/s/blog/{blogId}/comment/{commentId}/g-vote?eventSource=PostDetailView",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         elif wikiId:
             response = delete(
                 f"{self.client.api}/x{self.comId}/s/item/{wikiId}/comment/{commentId}/g-vote?eventSource=PostDetailView",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         else:
             raise exceptions.SpecifyType()
 
@@ -475,7 +467,7 @@ class SubClient:
     def unvote_comment(self, blogId: str, commentId: str):
         response = delete(
             f"{self.client.api}/x{self.comId}/s/blog/{blogId}/comment/{commentId}/vote?eventSource=PostDetailView",
-            headers=self.client.headers.headers(), )
+            headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -555,14 +547,14 @@ class SubClient:
 
     def delete_notification(self, notificationId: str):
         response = delete(f"{self.client.api}/x{self.comId}/s/notification/{notificationId}",
-                          headers=self.client.headers.headers(),)
+                          headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
             return response.status_code
 
     def clear_notifications(self):
-        response = delete(f"{self.client.api}/x{self.comId}/s/notification", headers=self.client.headers.headers(),)
+        response = delete(f"{self.client.api}/x{self.comId}/s/notification", headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -636,7 +628,8 @@ class SubClient:
     def send_coins(self, coins: int, blogId: str = None, chatId: str = None, objectId: str = None,
                    transactionId: str = None):
         url = None
-        if transactionId is None: transactionId = str(UUID(hexlify(urandom(16)).decode('ascii')))
+        if transactionId is None:
+            transactionId = str(UUID(hexlify(urandom(16)).decode('ascii')))
 
         data = {
             "coins": coins,
@@ -682,12 +675,12 @@ class SubClient:
         """
         if isinstance(userId, str):
             response = post(f"{self.client.api}/x{self.comId}/s/user-profile/{userId}/member",
-                            headers=self.client.headers.headers(),)
+                            headers=self.client.headers.headers())
 
         elif isinstance(userId, list):
             data = json.dumps({"targetUidList": userId, "timestamp": int(timestamp() * 1000)})
             response = post(f"{self.client.api}/x{self.comId}/s/user-profile/{self.profile.userId}/joined",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         else:
             raise exceptions.WrongType(type(userId))
@@ -710,7 +703,7 @@ class SubClient:
             - **Fail** : :meth:`Exceptions <amino.lib.util.exceptions>`
         """
         response = delete(f"{self.client.api}/x{self.comId}/s/user-profile/{self.profile.userId}/joined/{userId}",
-                          headers=self.client.headers.headers(),)
+                          headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -746,7 +739,7 @@ class SubClient:
 
             - **Fail** : :meth:`Exceptions <amino.lib.util.exceptions>`
         """
-        response = delete(f"{self.client.api}/x{self.comId}/s/block/{userId}", headers=self.client.headers.headers(),)
+        response = delete(f"{self.client.api}/x{self.comId}/s/block/{userId}", headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -765,8 +758,7 @@ class SubClient:
             - **Fail** : :meth:`Exceptions <amino.lib.util.exceptions>`
         """
         response = get(f"{self.client.api}/x{self.comId}/s/user-profile/{userId}?action=visit",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -827,10 +819,11 @@ class SubClient:
         else:
             return response.status_code
 
-    def send_message(self, chatId: str, message: str = None, messageType: int = 0, file: BinaryIO = None,
+    def send_message(self, message: str = None, messageType: int = 0, chatId: str = None, file: BinaryIO = None,
                      fileType: str = None, replyTo: str = None, mentionUserIds: list = None, stickerId: str = None,
                      embedId: str = None, embedType: int = None, embedLink: str = None, embedTitle: str = None,
-                     embedContent: str = None, embedImage: BinaryIO = None, refId: int = int(timestamp() / 10 % 1000000000)):
+                     embedContent: str = None, embedImage: BinaryIO = None,
+                     refId: int = int(timestamp() / 10 % 1000000000)):
         """
         Send a Message to a Chat.
 
@@ -945,11 +938,10 @@ class SubClient:
         data = json.dumps(data)
         if not asStaff:
             response = delete(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/message/{messageId}",
-                              headers=self.client.headers.headers(),
-)
+                              headers=self.client.headers.headers())
         else:
             response = post(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/message/{messageId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1051,8 +1043,7 @@ class SubClient:
         if pinChat is not None:
             if pinChat:
                 response = post(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/pin", data=data,
-                                headers=self.client.headers.headers(),
-)
+                                headers=self.client.headers.headers())
                 if response.status_code != 200:
                     res.append(exceptions.CheckException(json.loads(response.text)))
                 else:
@@ -1060,8 +1051,7 @@ class SubClient:
 
             if not pinChat:
                 response = post(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/unpin", data=data,
-                                headers=self.client.headers.headers(),
-)
+                                headers=self.client.headers.headers())
                 if response.status_code != 200:
                     res.append(exceptions.CheckException(json.loads(response.text)))
                 else:
@@ -1081,7 +1071,7 @@ class SubClient:
         if coHosts is not None:
             data = json.dumps({"uidList": coHosts, "timestamp": int(timestamp() * 1000)})
             response = post(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/co-host", data=data,
-                            headers=self.client.headers.headers(data=data),)
+                            headers=self.client.headers.headers(data=data), )
             if response.status_code != 200:
                 res.append(exceptions.CheckException(json.loads(response.text)))
             else:
@@ -1089,19 +1079,17 @@ class SubClient:
 
         if viewOnly is not None:
             if viewOnly:
-                response = post(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/view-only/enable", data=data,
-                                headers=self.client.headers.headers(data=data),
-)
+                response = post(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/logo-only/enable", data=data,
+                                headers=self.client.headers.headers(data=data))
                 if response.status_code != 200:
                     res.append(exceptions.CheckException(json.loads(response.text)))
                 else:
                     res.append(response.status_code)
 
             if not viewOnly:
-                response = post(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/view-only/disable",
+                response = post(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/logo-only/disable",
                                 data=data, headers=self.client.headers.headers(data=data),
-
-)
+                                )
                 if response.status_code != 200:
                     res.append(exceptions.CheckException(json.loads(response.text)))
                 else:
@@ -1111,8 +1099,7 @@ class SubClient:
             if canInvite:
                 response = post(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/members-can-invite/enable",
                                 data=data, headers=self.client.headers.headers(data=data),
-
-)
+                                )
                 if response.status_code != 200:
                     res.append(exceptions.CheckException(json.loads(response.text)))
                 else:
@@ -1121,8 +1108,7 @@ class SubClient:
             if not canInvite:
                 response = post(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/members-can-invite/disable",
                                 data=data, headers=self.client.headers.headers(data=data),
-
-)
+                                )
                 if response.status_code != 200:
                     res.append(exceptions.CheckException(json.loads(response.text)))
                 else:
@@ -1132,8 +1118,7 @@ class SubClient:
             if canTip:
                 response = post(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/tipping-perm-status/enable",
                                 data=data, headers=self.client.headers.headers(data=data),
-
-)
+                                )
                 if response.status_code != 200:
                     res.append(exceptions.CheckException(json.loads(response.text)))
                 else:
@@ -1142,8 +1127,7 @@ class SubClient:
             if not canTip:
                 response = post(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/tipping-perm-status/disable",
                                 data=data, headers=self.client.headers.headers(data=data),
-
-)
+                                )
                 if response.status_code != 200:
                     res.append(exceptions.CheckException(json.loads(response.text)))
                 else:
@@ -1192,7 +1176,7 @@ class SubClient:
         if not allowRejoin: allowRejoin = 0
         response = delete(
             f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/member/{userId}?allowRejoin={allowRejoin}",
-            headers=self.client.headers.headers(), )
+            headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1230,7 +1214,7 @@ class SubClient:
             - **Fail** : :meth:`Exceptions <amino.lib.util.exceptions>`
         """
         response = delete(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/member/{self.profile.userId}",
-                          headers=self.client.headers.headers(),)
+                          headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1321,8 +1305,7 @@ class SubClient:
 
     def get_vc_reputation_info(self, chatId: str):
         response = get(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/avchat-reputation",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1339,19 +1322,19 @@ class SubClient:
     def get_all_users(self, type: str = "recent", start: int = 0, size: int = 25):
         if type == "recent":
             response = get(f"{self.client.api}/x{self.comId}/s/user-profile?type=recent&start={start}&size={size}",
-                           headers=self.client.headers.headers(),)
+                           headers=self.client.headers.headers())
         elif type == "banned":
             response = get(f"{self.client.api}/x{self.comId}/s/user-profile?type=banned&start={start}&size={size}",
-                           headers=self.client.headers.headers(),)
+                           headers=self.client.headers.headers())
         elif type == "featured":
             response = get(f"{self.client.api}/x{self.comId}/s/user-profile?type=featured&start={start}&size={size}",
-                           headers=self.client.headers.headers(),)
+                           headers=self.client.headers.headers())
         elif type == "leaders":
             response = get(f"{self.client.api}/x{self.comId}/s/user-profile?type=leaders&start={start}&size={size}",
-                           headers=self.client.headers.headers(),)
+                           headers=self.client.headers.headers())
         elif type == "curators":
             response = get(f"{self.client.api}/x{self.comId}/s/user-profile?type=curators&start={start}&size={size}",
-                           headers=self.client.headers.headers(),)
+                           headers=self.client.headers.headers())
         else:
             raise exceptions.WrongType(type)
 
@@ -1363,7 +1346,7 @@ class SubClient:
     def get_online_users(self, start: int = 0, size: int = 25):
         response = get(
             f"{self.client.api}/x{self.comId}/s/live-layer?topic=ndtopic:x{self.comId}:online-members&start={start}&size={size}",
-            headers=self.client.headers.headers(), )
+            headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1372,7 +1355,7 @@ class SubClient:
     def get_online_favorite_users(self, start: int = 0, size: int = 25):
         response = get(
             f"{self.client.api}/x{self.comId}/s/user-group/quick-access?type=online&start={start}&size={size}",
-            headers=self.client.headers.headers(), )
+            headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1391,8 +1374,7 @@ class SubClient:
             - **Fail** : :meth:`Exceptions <amino.lib.util.exceptions>`
         """
         response = get(f"{self.client.api}/x{self.comId}/s/user-profile/{userId}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1413,8 +1395,7 @@ class SubClient:
             - **Fail** : :meth:`Exceptions <amino.lib.util.exceptions>`
         """
         response = get(f"{self.client.api}/x{self.comId}/s/user-profile/{userId}/joined?start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1435,8 +1416,7 @@ class SubClient:
             - **Fail** : :meth:`Exceptions <amino.lib.util.exceptions>`
         """
         response = get(f"{self.client.api}/x{self.comId}/s/user-profile/{userId}/member?start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1457,8 +1437,7 @@ class SubClient:
             - **Fail** : :meth:`Exceptions <amino.lib.util.exceptions>`
         """
         response = get(f"{self.client.api}/x{self.comId}/s/user-profile/{userId}/visitors?start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1466,8 +1445,7 @@ class SubClient:
 
     def get_user_checkins(self, userId: str):
         response = get(f"{self.client.api}/x{self.comId}/s/check-in/stats/{userId}?timezone={-timezone // 1000}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1475,8 +1453,7 @@ class SubClient:
 
     def get_user_blogs(self, userId: str, start: int = 0, size: int = 25):
         response = get(f"{self.client.api}/x{self.comId}/s/blog?type=user&q={userId}&start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1485,7 +1462,7 @@ class SubClient:
     def get_user_wikis(self, userId: str, start: int = 0, size: int = 25):
         response = get(
             f"{self.client.api}/x{self.comId}/s/item?type=user-all&start={start}&size={size}&cv=1.2&uid={userId}",
-            headers=self.client.headers.headers(), )
+            headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1493,8 +1470,7 @@ class SubClient:
 
     def get_user_achievements(self, userId: str):
         response = get(f"{self.client.api}/x{self.comId}/s/user-profile/{userId}/achievements",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1502,8 +1478,7 @@ class SubClient:
 
     def get_influencer_fans(self, userId: str, start: int = 0, size: int = 25):
         response = get(f"{self.client.api}/x{self.comId}/s/influencer/{userId}/fans?start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1523,8 +1498,7 @@ class SubClient:
             - **Fail** : :meth:`Exceptions <amino.lib.util.exceptions>`
         """
         response = get(f"{self.client.api}/{self.comId}/s/block?start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1544,8 +1518,7 @@ class SubClient:
             - **Fail** : :meth:`Exceptions <amino.lib.util.exceptions>`
         """
         response = get(f"{self.client.api}/x{self.comId}/s/block/full-list?start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1554,7 +1527,7 @@ class SubClient:
     def search_users(self, nickname: str, start: int = 0, size: int = 25):
         response = get(
             f"{self.client.api}/x{self.comId}/s/user-profile?type=name&q={nickname}&start={start}&size={size}",
-            headers=self.client.headers.headers(), )
+            headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1562,8 +1535,7 @@ class SubClient:
 
     def get_saved_blogs(self, start: int = 0, size: int = 25):
         response = get(f"{self.client.api}/x{self.comId}/s/bookmark?start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1573,22 +1545,22 @@ class SubClient:
         if "24" in type or "hour" in type:
             response = get(
                 f"{self.client.api}/g/s-x{self.comId}/community/leaderboard?rankingType=1&start={start}&size={size}",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         elif "7" in type or "day" in type:
             response = get(
                 f"{self.client.api}/g/s-x{self.comId}/community/leaderboard?rankingType=2&start={start}&size={size}",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         elif "rep" in type:
             response = get(
                 f"{self.client.api}/g/s-x{self.comId}/community/leaderboard?rankingType=3&start={start}&size={size}",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         elif "check" in type:
             response = get(f"{self.client.api}/g/s-x{self.comId}/community/leaderboard?rankingType=4",
-                           headers=self.client.headers.headers(),)
+                           headers=self.client.headers.headers())
         elif "quiz" in type:
             response = get(
                 f"{self.client.api}/g/s-x{self.comId}/community/leaderboard?rankingType=5&start={start}&size={size}",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         else:
             raise exceptions.WrongType(type)
         if response.status_code != 200:
@@ -1597,8 +1569,7 @@ class SubClient:
             return objects.UserProfileList(json.loads(response.text)["userProfileList"]).UserProfileList
 
     def get_wiki_info(self, wikiId: str):
-        response = get(f"{self.client.api}/x{self.comId}/s/item/{wikiId}", headers=self.client.headers.headers(),
-                       )
+        response = get(f"{self.client.api}/x{self.comId}/s/item/{wikiId}", headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1606,8 +1577,7 @@ class SubClient:
 
     def get_recent_wiki_items(self, start: int = 0, size: int = 25):
         response = get(f"{self.client.api}/x{self.comId}/s/item?type=catalog-all&start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1615,8 +1585,7 @@ class SubClient:
 
     def get_wiki_categories(self, start: int = 0, size: int = 25):
         response = get(f"{self.client.api}/x{self.comId}/s/item-category?start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1624,8 +1593,7 @@ class SubClient:
 
     def get_wiki_category(self, categoryId: str, start: int = 0, size: int = 25):
         response = get(f"{self.client.api}/x{self.comId}/s/item-category/{categoryId}?start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1637,19 +1605,19 @@ class SubClient:
             if quizId is not None: blogId = quizId
             response = get(
                 f"{self.client.api}/x{self.comId}/s/blog/{blogId}/tipping/tipped-users-summary?start={start}&size={size}",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         elif wikiId:
             response = get(
                 f"{self.client.api}/x{self.comId}/s/item/{wikiId}/tipping/tipped-users-summary?start={start}&size={size}",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         elif chatId:
             response = get(
                 f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/tipping/tipped-users-summary?start={start}&size={size}",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         elif fileId:
             response = get(
                 f"{self.client.api}/x{self.comId}/s/shared-folder/files/{fileId}/tipping/tipped-users-summary?start={start}&size={size}",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         else:
             raise exceptions.SpecifyType()
         if response.status_code != 200:
@@ -1671,8 +1639,7 @@ class SubClient:
             - **Fail** : :meth:`Exceptions <amino.lib.util.exceptions>`
         """
         response = get(f"{self.client.api}/x{self.comId}/s/chat/thread?type=joined-me&start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1693,7 +1660,7 @@ class SubClient:
         """
         response = get(
             f"{self.client.api}/x{self.comId}/s/chat/thread?type=public-all&filterType={type}&start={start}&size={size}",
-            headers=self.client.headers.headers(), )
+            headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1712,8 +1679,7 @@ class SubClient:
             - **Fail** : :meth:`Exceptions <amino.lib.util.exceptions>`
         """
         response = get(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1739,8 +1705,7 @@ class SubClient:
         else:
             url = f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/message?v=2&pagingType=t&size={size}"
 
-        response = get(url, headers=self.client.headers.headers(),
-                       )
+        response = get(url, headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1760,8 +1725,7 @@ class SubClient:
             - **Fail** : :meth:`Exceptions <amino.lib.util.exceptions>`
         """
         response = get(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/message/{messageId}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1770,14 +1734,14 @@ class SubClient:
     def get_blog_info(self, blogId: str = None, wikiId: str = None, quizId: str = None, fileId: str = None):
         if blogId or quizId:
             if quizId is not None: blogId = quizId
-            response = get(f"{self.client.api}/x{self.comId}/s/blog/{blogId}", headers=self.client.headers.headers(),)
+            response = get(f"{self.client.api}/x{self.comId}/s/blog/{blogId}", headers=self.client.headers.headers())
             if response.status_code != 200:
                 return exceptions.CheckException(json.loads(response.text))
             else:
                 return objects.GetBlogInfo(json.loads(response.text)).GetBlogInfo
 
         elif wikiId:
-            response = get(f"{self.client.api}/x{self.comId}/s/item/{wikiId}", headers=self.client.headers.headers(),)
+            response = get(f"{self.client.api}/x{self.comId}/s/item/{wikiId}", headers=self.client.headers.headers())
             if response.status_code != 200:
                 return exceptions.CheckException(json.loads(response.text))
             else:
@@ -1785,7 +1749,7 @@ class SubClient:
 
         elif fileId:
             response = get(f"{self.client.api}/x{self.comId}/s/shared-folder/files/{fileId}",
-                           headers=self.client.headers.headers(),)
+                           headers=self.client.headers.headers())
             if response.status_code != 200:
                 return exceptions.CheckException(json.loads(response.text))
             else:
@@ -1807,15 +1771,15 @@ class SubClient:
             if quizId is not None: blogId = quizId
             response = get(
                 f"{self.client.api}/x{self.comId}/s/blog/{blogId}/comment?sort={sorting}&start={start}&size={size}",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         elif wikiId:
             response = get(
                 f"{self.client.api}/x{self.comId}/s/item/{wikiId}/comment?sort={sorting}&start={start}&size={size}",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         elif fileId:
             response = get(
                 f"{self.client.api}/x{self.comId}/s/shared-folder/files/{fileId}/comment?sort={sorting}&start={start}&size={size}",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         else:
             raise exceptions.SpecifyType()
 
@@ -1826,8 +1790,7 @@ class SubClient:
 
     def get_blog_categories(self, size: int = 25):
         response = get(f"{self.client.api}/x{self.comId}/s/blog-category?size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1835,8 +1798,7 @@ class SubClient:
 
     def get_quiz_rankings(self, quizId: str, start: int = 0, size: int = 25):
         response = get(f"{self.client.api}/x{self.comId}/s/blog/{quizId}/quiz/result?start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1869,7 +1831,7 @@ class SubClient:
 
         response = get(
             f"{self.client.api}/x{self.comId}/s/user-profile/{userId}/comment?sort={sorting}&start={start}&size={size}",
-            headers=self.client.headers.headers(), )
+            headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1881,8 +1843,7 @@ class SubClient:
         else:
             url = f"{self.client.api}/x{self.comId}/s/feed/blog-all?pagingType=t&start={start}&size={size}"
 
-        response = get(url, headers=self.client.headers.headers(),
-                       )
+        response = get(url, headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1891,7 +1852,7 @@ class SubClient:
     def get_chat_users(self, chatId: str, start: int = 0, size: int = 25):
         response = get(
             f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/member?start={start}&size={size}&type=default&cv=1.2",
-            headers=self.client.headers.headers(), )
+            headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1899,8 +1860,7 @@ class SubClient:
 
     def get_notifications(self, start: int = 0, size: int = 25):
         response = get(f"{self.client.api}/x{self.comId}/s/notification?pagingType=t&start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1914,8 +1874,7 @@ class SubClient:
         :return: Notices List
         """
         response = get(f"{self.client.api}/x{self.comId}/s/notice?type=usersV2&status=1&start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1923,8 +1882,7 @@ class SubClient:
 
     def get_sticker_pack_info(self, sticker_pack_id: str):
         response = get(f"{self.client.api}/x{self.comId}/s/sticker-collection/{sticker_pack_id}?includeStickers=true",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1934,7 +1892,7 @@ class SubClient:
     def get_store_chat_bubbles(self, start: int = 0, size: int = 25):
         response = get(
             f"{self.client.api}/x{self.comId}/s/store/items?sectionGroupId=chat-bubble&start={start}&size={size}",
-            headers=self.client.headers.headers(), )
+            headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1946,7 +1904,7 @@ class SubClient:
     def get_store_stickers(self, start: int = 0, size: int = 25):
         response = get(
             f"{self.client.api}/x{self.comId}/s/store/items?sectionGroupId=sticker&start={start}&size={size}",
-            headers=self.client.headers.headers(), )
+            headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1956,8 +1914,7 @@ class SubClient:
 
     def get_community_stickers(self):
         response = get(f"{self.client.api}/x{self.comId}/s/sticker-collection?type=community-shared",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1965,8 +1922,7 @@ class SubClient:
 
     def get_sticker_collection(self, collectionId: str):
         response = get(f"{self.client.api}/x{self.comId}/s/sticker-collection/{collectionId}?includeStickers=true",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1974,8 +1930,7 @@ class SubClient:
 
     def get_shared_folder_info(self):
         response = get(f"{self.client.api}/x{self.comId}/s/shared-folder/stats",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1983,8 +1938,7 @@ class SubClient:
 
     def get_shared_folder_files(self, type: str = "latest", start: int = 0, size: int = 25):
         response = get(f"{self.client.api}/x{self.comId}/s/shared-folder/files?type={type}&start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -1999,26 +1953,26 @@ class SubClient:
         if userId:
             response = get(
                 f"{self.client.api}/x{self.comId}/s/admin/operation?objectId={userId}&objectType=0&pagingType=t&size={size}",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         elif blogId:
             response = get(
                 f"{self.client.api}/x{self.comId}/s/admin/operation?objectId={blogId}&objectType=1&pagingType=t&size={size}",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         elif quizId:
             response = get(
                 f"{self.client.api}/x{self.comId}/s/admin/operation?objectId={quizId}&objectType=1&pagingType=t&size={size}",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         elif wikiId:
             response = get(
                 f"{self.client.api}/x{self.comId}/s/admin/operation?objectId={wikiId}&objectType=2&pagingType=t&size={size}",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         elif fileId:
             response = get(
                 f"{self.client.api}/x{self.comId}/s/admin/operation?objectId={fileId}&objectType=109&pagingType=t&size={size}",
-                headers=self.client.headers.headers(), )
+                headers=self.client.headers.headers())
         else:
             response = get(f"{self.client.api}/x{self.comId}/s/admin/operation?pagingType=t&size={size}",
-                           headers=self.client.headers.headers(),)
+                           headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -2052,25 +2006,25 @@ class SubClient:
             data["adminOpValue"] = {"featuredType": 4}
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/user-profile/{userId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif blogId:
             data["adminOpValue"] = {"featuredType": 1}
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/blog/{blogId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif wikiId:
             data["adminOpValue"] = {"featuredType": 1}
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/item/{wikiId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif chatId:
             data["adminOpValue"] = {"featuredType": 5}
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         else:
             raise exceptions.SpecifyType()
@@ -2090,25 +2044,25 @@ class SubClient:
             data["adminOpValue"] = {"featuredType": 0}
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/user-profile/{userId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif blogId:
             data["adminOpValue"] = {"featuredType": 0}
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/blog/{blogId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif wikiId:
             data["adminOpValue"] = {"featuredType": 0}
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/item/{wikiId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif chatId:
             data["adminOpValue"] = {"featuredType": 0}
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         else:
             raise exceptions.SpecifyType()
@@ -2130,42 +2084,42 @@ class SubClient:
             data["adminOpName"] = 18
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/user-profile/{userId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif blogId:
             data["adminOpName"] = 110
             data["adminOpValue"] = 9
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/blog/{blogId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif quizId:
             data["adminOpName"] = 110
             data["adminOpValue"] = 9
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/blog/{quizId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif wikiId:
             data["adminOpName"] = 110
             data["adminOpValue"] = 9
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/item/{wikiId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif chatId:
             data["adminOpName"] = 110
             data["adminOpValue"] = 9
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif fileId:
             data["adminOpName"] = 110
             data["adminOpValue"] = 9
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/shared-folder/files/{fileId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         else:
             raise exceptions.SpecifyType()
@@ -2187,42 +2141,42 @@ class SubClient:
             data["adminOpName"] = 19
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/user-profile/{userId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif blogId:
             data["adminOpName"] = 110
             data["adminOpValue"] = 0
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/blog/{blogId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif quizId:
             data["adminOpName"] = 110
             data["adminOpValue"] = 0
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/blog/{quizId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif wikiId:
             data["adminOpName"] = 110
             data["adminOpValue"] = 0
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/item/{wikiId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif chatId:
             data["adminOpName"] = 110
             data["adminOpValue"] = 0
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/chat/thread/{chatId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         elif fileId:
             data["adminOpName"] = 110
             data["adminOpValue"] = 0
             data = json.dumps(data)
             response = post(f"{self.client.api}/x{self.comId}/s/shared-folder/files/{fileId}/admin",
-                            headers=self.client.headers.headers(data=data), data=data,)
+                            headers=self.client.headers.headers(data=data), data=data, )
 
         else:
             raise exceptions.SpecifyType()
@@ -2357,8 +2311,7 @@ class SubClient:
 
     def get_hidden_blogs(self, start: int = 0, size: int = 25):
         response = get(f"{self.client.api}/x{self.comId}/s/feed/blog-disabled?start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -2366,8 +2319,7 @@ class SubClient:
 
     def get_featured_users(self, start: int = 0, size: int = 25):
         response = get(f"{self.client.api}/x{self.comId}/s/user-profile?type=featured&start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -2375,8 +2327,7 @@ class SubClient:
 
     def review_quiz_questions(self, quizId: str):
         response = get(f"{self.client.api}/x{self.comId}/s/blog/{quizId}?action=review",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -2384,8 +2335,7 @@ class SubClient:
 
     def get_recent_quiz(self, start: int = 0, size: int = 25):
         response = get(f"{self.client.api}/x{self.comId}/s/blog?type=quizzes-recent&start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -2393,8 +2343,7 @@ class SubClient:
 
     def get_trending_quiz(self, start: int = 0, size: int = 25):
         response = get(f"{self.client.api}/x{self.comId}/s/feed/quiz-trending?start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -2402,8 +2351,7 @@ class SubClient:
 
     def get_best_quiz(self, start: int = 0, size: int = 25):
         response = get(f"{self.client.api}/x{self.comId}/s/feed/quiz-best-quizzes?start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:
@@ -2533,8 +2481,7 @@ class SubClient:
 
     def get_wiki_submissions(self, start: int = 0, size: int = 25):
         response = get(f"{self.client.api}/x{self.comId}/s/knowledge-base-request?type=all&start={start}&size={size}",
-                       headers=self.client.headers.headers(),
-                       )
+                       headers=self.client.headers.headers())
         if response.status_code != 200:
             return exceptions.CheckException(json.loads(response.text))
         else:

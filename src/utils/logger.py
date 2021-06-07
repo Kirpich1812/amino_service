@@ -1,5 +1,6 @@
 import logging
 import sys
+import traceback
 
 import coloredlogs
 
@@ -33,7 +34,7 @@ def service_align(email: str, action: str):
     return "[" + email + " " * spaces + "]: " + action
 
 
-def lifecycle_logger(func):
+def exception_handler(func):
     def wrapper(*args):
         try:
             func(*args)
@@ -41,6 +42,7 @@ def lifecycle_logger(func):
             error_message = e.args[0]
             if isinstance(error_message, str):
                 logger.error(error_message)
+                file_logger.debug(traceback.format_exc())
             if isinstance(error_message, dict):
                 if isinstance(args[-1], tuple):
                     logger.error(service_align(args[-1][0], error_message["api:message"]))

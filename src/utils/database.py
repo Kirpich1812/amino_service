@@ -1,6 +1,6 @@
 import sqlite3
 
-from src.utils.paths import DATABASE_PATH
+from src.utils.configs import DATABASE_PATH
 
 DB = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
 DB_CURSOR = DB.cursor()
@@ -29,7 +29,7 @@ class DatabaseController:
         return DB_CURSOR.fetchall()
 
     def get_bots_cursor(self):
-        DB_CURSOR.execute("""SELECT * FROM bots""")
+        DB_CURSOR.execute("""SELECT email, password, is_valid, valid_time FROM bots""")
         return DB_CURSOR
 
     def set_bots(self, accounts: list):

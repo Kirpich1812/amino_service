@@ -1,17 +1,39 @@
 import os
 import time
+import traceback
 from multiprocessing.pool import ThreadPool
 
+from termcolor import colored
+
 import amino
-from src.utils.logger import lifecycle_logger, logger
-from src.utils.paths import CHAT_SETTINGS_PATH
+from src.utils.chat import get_chat_id
+from src.utils.logger import exception_handler, logger, file_logger
+from src.utils.configs import CHAT_SETTINGS_PATH, CHAT_MODERATION_MENU
+from src.utils.table import create_table
 
 
 class ChatModeration:
     def __init__(self, sub_client: amino.SubClient):
         self.sub_client = sub_client
+        while True:
+            try:
+                logger.info(colored(create_table("Chat Moderation", CHAT_MODERATION_MENU), "cyan"))
+                choice = input("Select action >>> ")
+                if choice == "1":
+                    self.clear_chat(get_chat_id(self.sub_client))
+                if choice == "2":
+                    self.save_chat_settings(get_chat_id(self.sub_client))
+                if choice == "3":
+                    self.set_view_mode(get_chat_id(self.sub_client))
+                if choice == "4":
+                    self.set_view_mode_timer(get_chat_id(self.sub_client))
+                if choice == "b":
+                    break
+            except Exception as e:
+                logger.error(str(e))
+                file_logger.debug(traceback.format_exc())
 
-    @lifecycle_logger
+    @exception_handler
     def clear_chat(self, chatid: str):
         count = int(input("Number of messages: "))
         pool = ThreadPool(50)
@@ -36,7 +58,7 @@ class ChatModeration:
                 deleted += 1
                 logger.info(f"{deleted} messages deleted")
 
-    @lifecycle_logger
+    @exception_handler
     def save_chat_settings(self, chatid: str):
         if not os.path.exists(CHAT_SETTINGS_PATH):
             os.mkdir(CHAT_SETTINGS_PATH)
@@ -60,24 +82,24 @@ class ChatModeration:
             settings_file.write(data)
         logger.info(f"Settings saved in {os.path.join(CHAT_SETTINGS_PATH, f'{chatid}.txt')}")
 
-    @lifecycle_logger
+    @exception_handler
     def set_view_mode(self, chatid: str):
         chat = self.sub_client.get_chat_thread(chatId=chatid)
         admins = [*chat.coHosts, chat.author.userId]
         if self.sub_client.profile.userId in admins:
             self.sub_client.edit_chat(chatId=chatid, viewOnly=True)
-            logger.info("Chat mode is set to view")
+            logger.info("Chat mode is set to logo")
         else:
             logger.error("You don't have co-host/host rights to use this function")
 
-    @lifecycle_logger
+    @exception_handler
     def set_view_mode_timer(self, chatid: str):
         duration = int(input("Duration in seconds: "))
         chat = self.sub_client.get_chat_thread(chatId=chatid)
         admins = [*chat.coHosts, chat.author.userId]
         if self.sub_client.profile.userId in admins:
             self.sub_client.edit_chat(chatId=chatid, viewOnly=True)
-            logger.info("Chat mode is set to view")
+            logger.info("Chat mode is set to logo")
             while duration > 0:
                 logger.info(f"{duration} seconds left")
                 duration -= 1

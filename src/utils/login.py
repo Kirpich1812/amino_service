@@ -6,7 +6,7 @@ from multiprocessing.pool import ThreadPool
 import amino
 from src.utils.database import DatabaseController
 from src.utils.logger import service_align, logger, file_logger
-from src.utils.paths import DEVICE_IDS_PATH
+from src.utils.configs import DEVICE_IDS_PATH
 
 device_id_list = open(DEVICE_IDS_PATH, "r").readlines()
 

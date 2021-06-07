@@ -1227,7 +1227,7 @@ class Client:
 
         if viewOnly is not None:
             if viewOnly:
-                response = post(f"{self.api}/g/s/chat/thread/{chatId}/view-only/enable", data=data,
+                response = post(f"{self.api}/g/s/chat/thread/{chatId}/logo-only/enable", data=data,
                                 headers=self.headers.headers(data=data),
                                 )
                 if response.status_code != 200:
@@ -1236,7 +1236,7 @@ class Client:
                     res.append(response.status_code)
 
             if not viewOnly:
-                response = post(f"{self.api}/g/s/chat/thread/{chatId}/view-only/disable", data=data,
+                response = post(f"{self.api}/g/s/chat/thread/{chatId}/logo-only/disable", data=data,
                                 headers=self.headers.headers(data=data),
                                 )
                 if response.status_code != 200:

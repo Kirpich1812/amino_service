@@ -8,7 +8,7 @@ from colorama import init
 from termcolor import colored
 
 from src.utils.logger import logger, file_logger
-from src.utils.paths import LOGO_VIEW_PATH
+from src.utils.configs import LOGO_VIEW_PATH
 from src.service import ServiceApp
 
 if __name__ == '__main__':
@@ -18,19 +18,25 @@ if __name__ == '__main__':
     os.system('cls' if os.name == 'nt' else 'clear')
     init()
 
-    with open("version.json") as info_file:
-        info = json.load(info_file)
+    __info__ = json.loads(requests.get("https://github.com/LynxN1/amino_service/raw/master/version.json").text)
 
-    __version__   = info["version"]
-    __author__    = info["author"]
-    __github__    = info["github"]
-    __telegram__  = info["telegram"]
-    __newest__    = json.loads(requests.get("https://github.com/LynxN1/amino_service/raw/master/version.json").text)["version"]
+    __version__   = __info__["version"]
+    __author__    = __info__["author"]
+    __github__    = __info__["github"]
+    __telegram__  = __info__["telegram"]
+    try:
+        __current__ = json.loads(open("version.json").read())["version"]
+    except:
+        __current__ = None
 
-    if __version__ != __newest__:
-        logger.warning(f"New version of Amino Service available! ({__newest__})\n")
+    if __version__ != __current__:
+        logger.warning(f"New version of Amino Service available! ({__version__})\n")
 
-    logger.info(colored(open(LOGO_VIEW_PATH, "r").read().replace("v?", __version__).replace("a?", __author__).replace("g?", __github__).replace("_", " ").replace("t?", __telegram__), "green"))
+    logger.info(colored(open(LOGO_VIEW_PATH, "r").read().replace("_", " "), "green"))
+    logger.info(colored(f"Author     {__author__}\n"
+                        f"Version    {__current__}\n"
+                        f"Github     {__github__}\n"
+                        f"Telegram   {__telegram__}\n", "green"))
 
     try:
         ServiceApp().run()

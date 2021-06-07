@@ -8,6 +8,8 @@ def get_chat_id(sub_client: amino.SubClient):
     choice = int(input(">>> "))
     if choice == 1:
         chats = sub_client.get_chat_threads(start=0, size=100)
+        if not chats.chatId:
+            raise Exception("Chat list is empty")
         for x, title in enumerate(chats.title, 1):
             logger.info(f"{x}. {title}")
         index = input("Select chat: ")

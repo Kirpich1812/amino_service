@@ -2,15 +2,20 @@ import os
 import random
 
 import amino
-from src.utils.logger import lifecycle_logger, logger
+from src.utils.logger import exception_handler, logger
 from src.utils.nick_gen import UsernameGenerator
-from src.utils.paths import ACCOUNTS_DIR_PATH, REG_DEVICES_PATH, CREATED_ACCOUNTS_PATH, DEVICE_IDS_PATH
+from src.utils.configs import ACCOUNTS_DIR_PATH, REG_DEVICES_PATH, CREATED_ACCOUNTS_PATH, DEVICE_IDS_PATH
 
 device_id_list = open(DEVICE_IDS_PATH, "r").readlines()
 
 
 class CreateAccounts:
     def __init__(self):
+        if not os.path.exists(ACCOUNTS_DIR_PATH):
+            os.mkdir(ACCOUNTS_DIR_PATH)
+        if not os.path.exists(REG_DEVICES_PATH):
+            logger.error(REG_DEVICES_PATH + " not found")
+            return
         self.client = amino.Client()
         self.email = None
         self.password = input("Set a password for all accounts: ")
@@ -20,13 +25,8 @@ class CreateAccounts:
         self.code = None
         self.count = 0
 
-    @lifecycle_logger
+    @exception_handler
     def run(self):
-        if not os.path.exists(ACCOUNTS_DIR_PATH):
-            os.mkdir(ACCOUNTS_DIR_PATH)
-        if not os.path.exists(REG_DEVICES_PATH):
-            logger.error(REG_DEVICES_PATH + " not found")
-            return
         reg_devices = open(REG_DEVICES_PATH, "r").readlines()
         if reg_devices:
             for device in reg_devices:

@@ -2,7 +2,7 @@ import os
 
 from src.utils.database import DatabaseController
 from src.utils.logger import logger
-from src.utils.paths import BOTS_TXT_PATH
+from src.utils.configs import BOTS_TXT_PATH
 
 
 def convert_from_txt():
